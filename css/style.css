@@ -14,6 +14,8 @@
 	--scrollbar-c:		#888888;
 
     --border-radius-s: 4px;
+
+    --transition-time: .3s;
 }
 
 /* fonts */
@@ -74,59 +76,24 @@ input:focus, textarea:focus{
     margin: 100px auto;
 }
 
-.s{
-    transition: all .2s;
+.s-main{
+    width: 80%;
+    margin: auto;
 }
 
-.s:hover{
+.s-hover{
+    transition: all var(--transition-time);
+}
+
+.s-hover:hover{
     box-shadow:  0 0 0 2px var(--card-border-focus);
 }
 
 .s-head{
     font-family: 'Fira';
     font-size: 1.2em;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
-}
-
-
-.s1-input{
-    background-color: var(--second-bgc);
-    box-shadow: 0 0 0 1px var(--card-border);
-    border-radius: var(--border-radius-s);
-    width: 80%;
-    margin: 20px auto;
-    padding: 20px;
-}
-
-.input-box{
-    width: 80%;
-    margin: 20px auto;
-    border: none;
-    box-shadow: 0 0 0 1px var(--card-border);
-    border-radius: var(--border-radius-s);
-}
-
-.input-box-inner{
-    box-sizing: border-box;
-    width: 100%;
-    border: none;
-    resize: none;
-    border-radius: var(--border-radius-s);
-    height: 100px;
-    padding: 10px;
-    transition: height .2s;
-}
-
-.input-box-inner:focus{
-    /* box-shadow:  0 0 0 2px var(--card-border-focus); */
-    height: 250px;
-}
-
-.button-gp{
-    width: 80%;
-    margin: auto;
-    padding: 10px;
 }
 
 .s-button{
@@ -134,7 +101,7 @@ input:focus, textarea:focus{
     border: none;
     background-color: var(--third-bgc);
     border-radius: var(--border-radius-s);
-    transition: all .2s;
+    transition: all var(--transition-time);
     color: var(--first-c);
     font-family: 'Fira';
     margin-right: 5px;
@@ -153,6 +120,48 @@ input:focus, textarea:focus{
     background-color: var(--fourth-bgc-hover);
 }
 
-/* .input-box:active{
-    box-shadow:  0 0 0 2px var(--card-border-focus);
-} */
+.s1-input{
+    background-color: var(--second-bgc);
+    box-shadow: 0 0 0 1px var(--card-border);
+    border-radius: var(--border-radius-s);
+    margin: auto;
+    padding: 30px 40px;
+}
+
+.s1-input .input-box{
+    margin: 20px auto;
+    padding: 20px;
+    border: none;
+    box-shadow: 0 0 0 1px var(--card-border);
+    border-radius: var(--border-radius-s);
+}
+
+.input-box-inner{
+    box-sizing: border-box;
+    width: 100%;
+    border: none;
+    resize: none;
+    height: 100px;
+    transition: height var(--transition-time);
+    font-family: 'AzeretMono';
+    font-size: 0.9em;
+    line-height: 1.5em;
+}
+
+.input-box-inner:focus{
+    height: 210px;
+}
+
+.s1-split{
+    background-image: url(../img/arrow.svg);
+    background-repeat: no-repeat;
+    background-position: 300px -30px;
+    height: 85px;
+}
+
+.s2-split{
+    background-image: url(../img/arrow.svg);
+    background-repeat: no-repeat;
+    background-position: 400px -30px;
+    height: 85px;
+}
