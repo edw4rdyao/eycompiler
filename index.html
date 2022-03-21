@@ -10,112 +10,133 @@
 </head>
 
 <body>
-    <div class="main">
+    <div class="main" id="main">
         <div class="s-main">
-            <div class="s-hover s1-input">
+            <div class="s-card s1-input">
                 <div class="s-head">
                     Input the source code
                 </div>
                 <div class="input-box">
-                    <textarea class="input-box-inner" placeholder="please type the source code..."></textarea>
+                    <textarea id="source-code" class="input-box-inner"
+                        placeholder="please type the source code..."></textarea>
                 </div>
                 <div>
-                    <button class="s-button">Upload</button>
-                    <button class="s-button s-blue">Submit</button>
+                    <button class="s-button">
+                        <input type="file" class="s-upload" id="s1-upload" onchange="uploadSource()">Upload
+                    </button>
+                    <button class="s-button s-blue" id="s1-submit" onchange="updateS1Button()" onclick="lexicalResultDisplay()">Submit</button>
                 </div>
             </div>
 
-            <div class="s1-split"></div>
-            <div class="s-hover s2-lexical">
+            <div class="s1-split" id="s1-split"></div>
+            <div class="s-card s2-lexical" id="s2-lexical">
                 <div class="s-head">
                     Lexical analysis result
                 </div>
                 <div class="s2-table-box">
-                    <table class="s-table">
-                        <tr>
-                            <th>Type</th>
-                            <th>Value</th>
-                            <th>Row</th>
-                            <th>Col</th>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr><tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                        <tr>
-                            <td>int</td>
-                            <td>int</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-
+                    <table class="s-table" id="lexical-table">
                     </table>
-
                 </div>
                 <div>
-                    <button class="s-button">Download</button>
-                    <button class="s-button s-blue">Continue</button>
+                    <button class="s-button" id="s2-download">Download</button>
+                    <button class="s-button s-blue" id="s2-continue">Continue</button>
                 </div>
             </div>
             <div class="s2-split"></div>
-
-
         </div>
         <div class="d-main">
-            <div class="s-hover d1-intro">
+            <div class="s-card d1-intro">
                 <div class="s-head">
                     Wecome
                 </div>
             </div>
         </div>
+        <div class="s-clear"></div>
     </div>
 
     <script src="./js/compliler.js"></script>
     <script>
-        // Work();
+        // var
+        var lA, tS;
+
+        // my alert
+        function sAlert(e) {
+            var d = document.createElement('div');
+            d.classList.add('alert-mask');
+            d.id = 'alert-mask';
+            d.innerHTML = `<div class="alert-main">\
+                <div class="alert-head">ERROR</div>\
+                <div class="alert-content">${e}</div>\
+                <div class="alert-ok">\
+                    <button class="s-button s-fl" onclick = "sAlertOk()">OK</button>\
+                    <button class="s-button s-blue s-fr" onclick = "sReset()">Reset</button>\
+                    <div class="s-clear"></div>\
+                </div>\
+            </div>`;
+            document.getElementById('main').appendChild(d);
+        }
+        function sAlertOk(){
+            document.getElementById('alert-mask').remove();
+        }
+        function sReset(){
+            document.getElementById('alert-mask').remove();
+            document.getElementById('s1-split').style.display = 'none';
+            document.getElementById('s2-lexical').style.display = 'none';
+            document.getElementById('source-code').value = '';
+        }
+
+        // function updateS1Button(){
+        //     if(document.getElementById('source-code').value == ''){
+        //         // document.getElementById('s1-submit');
+        //     }
+        //     else{
+        //         // document.getElementById('s1-submit').disabled = 'false';
+        //     }
+        // }
+
+        // step1 upload the file
+        function uploadSource() {
+            var r = new FileReader();
+            var f = document.getElementById('s1-upload');
+            if (f.files.length === 0) {
+                sAlert('No File!');
+                return;
+            }
+            r.onload = function () {
+                document.getElementById('source-code').value = r.result;
+            }
+            r.readAsText(f.files[0]);
+            f.value = '';
+        }
+
+        // step2 lexical analysis and display the result
+        function lexicalResultDisplay() {
+            lA = new LexicalAnalysis(document.getElementById('source-code').value);
+            try {
+                lA.analysisTokenStream();
+                tS = lA.tokenStream;
+            } catch (e) {
+                sAlert(e);
+                return;
+            }
+            document.getElementById('s1-split').style.display = 'block';
+            document.getElementById('s2-lexical').style.display = 'block';
+            document.getElementById('lexical-table').innerHTML = '';
+            var t = '<tr>\
+                        <th>Type</th>\
+                        <th>Value</th>\
+                        <th>Row</th>\
+                        <th>Col</th>\
+                    </tr>';
+            for(let i = 0; i < tS.length; i ++){
+                t += `<tr><td>${tS[i].token}</td><td>${tS[i].value}</td><td>${tS[i].position.row}</td>\
+                    <td>${tS[i].position.row}</td></tr>`;
+            }
+            document.getElementById('lexical-table').innerHTML = t;
+        }
+
+        
     </script>
 </body>
 
-</html>
+</html

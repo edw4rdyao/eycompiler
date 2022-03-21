@@ -34,8 +34,7 @@ class LexicalAnalysis {
         const operatorTwo = ["==", ">=", "<=", "!="];
         const identifier = "<ID>";
         const constInt = "<INT>";
-        // const allToken = keyword.concat(separator, operatorOne, operatorTwo, identifier, constInt);
-
+        
         // analysis
         var curRow = 1, curCol = 0;
         var curString = "";
@@ -298,14 +297,17 @@ class Grammar{
             flag = false;
             for(let i = 0; i < this.nonTerminal.length; i ++){
                 for(let j = 0; j < this.productions.length; j ++){
-                    if(this.productions[j].leftSymbol != this.nonTerminal[i]){
+                    let pro = this.productions[j];
+                    if(pro.leftSymbol != this.nonTerminal[i]){
                         continue;
                     }
-                    // !TODO
-
                     // the right is start by terminal or empty
+                    if(this.terminal.indexOf(pro[0])!= -1 || this.symbols[pro[0]].type === 'empty'){
+                        // insert the symbol into firstset, and update flag
 
+                    }
                     // the right is start by non terminal
+                    let canBeEmpty = true;
                     
                 }
             }

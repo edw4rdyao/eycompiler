@@ -8,14 +8,14 @@
     --fourth-bgc-hover: rgb(64, 74, 179);
     --fifth-bgc:        #eaf1fd;
     --first-c:          #3d3d3d;
-    --card-border:      rgba(23, 23, 23, 0.1);
-    --hr-border:        rgba(23, 23, 23, 0.1);
+    --card-border:      rgba(23, 23, 23, 0.2);
     --card-border-focus:rgb(59, 73, 223);
+    --alert-border-focus:#f15f5f;
     --scrollbar-bgc:	#d6d6d6;
 	--scrollbar-c:		#888888;
 
     --border-radius-s: 4px;
-    --border-radius-m: 6px;
+    --border-radius-m: 9px;
 
     --transition-time: .3s;
 }
@@ -24,11 +24,6 @@
 @font-face {
     font-family: Fira;
       src: url("../fonts/FiraCode.ttf");
-}
-
-@font-face {
-    font-family: Ubuntu;
-      src: url("../fonts/Ubuntu.ttf");
 }
 
 @font-face {
@@ -74,10 +69,64 @@ input:focus, textarea:focus{
     outline: none;
 }
 
+.s-fl{
+    float: left;
+}
+
+.s-fr{
+    float: right;
+}
+
+.s-clear{
+    clear: both;
+}
+
 .main{
     max-width: 1150px;
     min-width: 900px;
     margin: 100px auto;
+}
+
+.alert-mask{
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+
+.alert-main{
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background-color: #fff;
+    border-radius: var(--border-radius-m);
+    box-shadow: 0px 2px 4px 1px var(--card-border);
+    padding: 0px 25px ;
+}
+
+.alert-head{
+    font-family: 'Fira';
+    font-size: 1.2em;
+    text-align: center;
+    margin: 20px auto;
+}
+
+.alert-content{
+    font-family: 'AzeretMono';
+    font-size: 0.9em;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.alert-ok{
+    margin: 20px auto;
+    width: 80%;
 }
 
 .d-main{
@@ -88,10 +137,8 @@ input:focus, textarea:focus{
 
 .d1-intro{
     background-color: var(--second-bgc);
-    box-shadow: 0 0 0 1px var(--card-border);
     border-radius: var(--border-radius-m);
     margin: auto;
-    padding: 30px 40px;
 }
 
 .s-main{
@@ -100,12 +147,15 @@ input:focus, textarea:focus{
     float: left;
 }
 
-.s-hover{
+.s-card{
+    box-shadow: 0px 2px 4px 1px var(--card-border);
     transition: all var(--transition-time);
+    background-color: var(--second-bgc);
+    padding: 23px 40px;
 }
 
-.s-hover:hover{
-    box-shadow:  0 0 0 2px var(--card-border-focus);
+.s-card:hover{
+    box-shadow:  0 0 1px 2px var(--card-border-focus);
 }
 
 .s-head{
@@ -114,7 +164,21 @@ input:focus, textarea:focus{
     text-align: center;
 }
 
+.s-upload{
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    cursor: pointer;
+}
+
 .s-button{
+    display: inline-block;
+    position: relative;
     padding: 8px 16px;
     border: none;
     background-color: var(--third-bgc);
@@ -122,7 +186,9 @@ input:focus, textarea:focus{
     transition: all var(--transition-time);
     color: var(--first-c);
     font-family: 'Fira';
-    margin-right: 5px;
+    margin-right: 8px;
+    cursor: pointer;
+    min-width: 80px;
 }
 
 .s-button:hover{
@@ -153,16 +219,13 @@ input:focus, textarea:focus{
 }
 
 .s1-input{
-    background-color: var(--second-bgc);
-    box-shadow: 0 0 0 1px var(--card-border);
     border-radius: var(--border-radius-m);
     margin: auto;
-    padding: 30px 40px;
 }
 
 .s1-input .input-box{
     margin: 20px auto;
-    padding: 20px;
+    padding: 1px;
     border: none;
     border-radius: var(--border-radius-s);
     background-color: var(--fifth-bgc);
@@ -173,16 +236,17 @@ input:focus, textarea:focus{
     width: 100%;
     border: none;
     resize: none;
-    height: 100px;
+    height: 150px;
+    padding: 10px 20px;
     transition: height var(--transition-time);
     font-family: 'AzeretMono';
-    font-size: 0.9em;
+    font-size: 0.85em;
     line-height: 1.5em;
     background-color: var(--fifth-bgc);
 }
 
 .input-box-inner:focus{
-    height: 210px;
+    height: 250px;
 }
 
 .s1-split{
@@ -190,14 +254,13 @@ input:focus, textarea:focus{
     background-repeat: no-repeat;
     background-position: 300px -30px;
     height: 85px;
+    display: none;
 }
 
 .s2-lexical{
-    background-color: var(--second-bgc);
-    box-shadow: 0 0 0 1px var(--card-border);
     border-radius: var(--border-radius-m);
     margin: auto;
-    padding: 30px 40px;
+    display: none;
 }
 
 .s2-table-box{
@@ -214,4 +277,5 @@ input:focus, textarea:focus{
     background-repeat: no-repeat;
     background-position: 450px -30px;
     height: 85px;
+    display: none;
 }
