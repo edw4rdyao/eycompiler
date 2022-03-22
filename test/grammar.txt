@@ -2,7 +2,6 @@
 
 S -> Program
 Program -> ExtDefList 
-
 ExtDefList -> ExtDef ExtDefList | @
 ExtDef -> VarSpecifier <ID> ; | FunSpecifier FunDec Block
 VarSpecifier -> int

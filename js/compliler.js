@@ -134,7 +134,7 @@ class LexicalAnalysis {
             }
             // error
             else{
-                throw `Undefined Symbol '${curString}', in (${curRow},${curRow})`;
+                throw `Undefined Symbol '${curString}', in (${curRow},${curCol})`;
             }
         }
     }
@@ -192,8 +192,8 @@ class SymanticAnalysis{
 class GrammarSymbol{
     constructor(type, token){
         this.type = type;
-        this.firstSet = [];
-        this.followSet = [];
+        this.firstSet = new Set();
+        this.followSet = new Set();
         this.token = token;
     }
 }
@@ -221,6 +221,7 @@ class Grammar{
         this.productions = [];
         this.startProduction = -1;
         this.parserGrammar(grammarSource);
+        this.getFirstSet();
     }
     parserGrammar(grammarSource){
         // add endToken #
@@ -229,7 +230,7 @@ class Grammar{
         // add emptyToken @
         this.symbols.push(new GrammarSymbol('empty', '@'));
 
-        // var cnt = 0;
+        // for every production
         var allProductions = grammarSource.split('\n');
         for(let i = 0; i < allProductions.length; i ++){
             // clear the blank in begin and end
@@ -292,25 +293,56 @@ class Grammar{
         }
     }
     getFirstSet(){
-        var flag = false;
+        var f = false;
         while(true){
-            flag = false;
+            f = false;
             for(let i = 0; i < this.nonTerminal.length; i ++){
+                let nt = this.nonTerminal[i], ntfs = this.symbols[nt].firstSet;
                 for(let j = 0; j < this.productions.length; j ++){
-                    let pro = this.productions[j];
-                    if(pro.leftSymbol != this.nonTerminal[i]){
+                    if(i == 1 && j == 1){
+                        var a = 0;
+                    }
+                    let p = this.productions[j];
+                    if(p.leftSymbol != nt){
                         continue;
                     }
+                    p = this.productions[j].rightSymbol;
                     // the right is start by terminal or empty
-                    if(this.terminal.indexOf(pro[0])!= -1 || this.symbols[pro[0]].type === 'empty'){
+                    if(this.terminal.indexOf(p[0])!= -1 || this.symbols[p[0]].type === 'empty'){
                         // insert the symbol into firstset, and update flag
-
+                        if(!ntfs.has(p[0])){
+                            ntfs.add(p[0]);
+                            f = true;
+                        }
+                        continue;
                     }
                     // the right is start by non terminal
-                    let canBeEmpty = true;
-                    
+                    let be = true;
+                    for(let k = 0; k < p.length; k ++){
+                        let pk = p[k], pkfs = this.symbols[p[k]].firstSet;
+                        // meet terminal
+                        if(this.terminal.indexOf(pk)!= -1){
+                            // merge the firstset
+                            f = this.mergeFirstSet(ntfs, pkfs) || f;
+                            be = false;
+                            break;
+                        }
+                        
+                        f = this.mergeFirstSet(ntfs, pkfs) || f;
+                        be = be && pkfs.has(this.getSymbolIndex('@'));
+
+                        if(!be) break;
+                    }
+                    // can be empty
+                    if(be){
+                        if(!ntfs.has(this.getSymbolIndex('@'))){
+                            ntfs.add(this.getSymbolIndex('@'));
+                            f = true;
+                        }
+                    }
                 }
             }
+            if(!f) break;
         }
     }
     getSymbolIndex(str){
@@ -322,7 +354,18 @@ class Grammar{
         return -1;
     }
     firstSetOfString(str){
-
+        
+    }
+    mergeFirstSet(des, src){
+        let s = des.size;
+        let srcarr = Array.from(src);
+        for (let i = 0; i < Array.from(src).length; i ++) {
+            if(this.symbols[srcarr[i]].type != 'empty'){
+                des.add(srcarr[i]);
+            }
+        }
+        if(s < des.size) return true;
+        else return false;
     }
 }
 
@@ -367,10 +410,7 @@ class GrammarAnalysis{
  * @description: main fuction to work
  * @param: config
  */
-function Work() {
-    // var testSources = "int main(){\n\tint a = 1 + 98304230;\n\treturn 0;\n}";
-    // var lexicalAnalysis = new LexicalAnalysis(testSources);
-    // lexicalAnalysis.analysisTokenStream();
+function test() {
     var grammarSource = "\
         @Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==\
         \nS -> Program\
@@ -407,8 +447,17 @@ function Work() {
         \nWhileStmt_m1 -> @\
         \nWhileStmt_m2 -> @\
     ";
-    var grammarAnalysis = new GrammarAnalysis(grammarSource);
-    console.log(grammarAnalysis.getProduction);
-    console.log(grammarAnalysis.getSysmbol);
-    // console.log(lexicalAnalysis.getTokenStream);
+    var gA = new GrammarAnalysis(grammarSource);
+    var p = gA.getProduction;
+    console.log(p);
+    var s = gA.getSysmbol;
+    console.log(gA.getSysmbol);
+    p.forEach(function (v){
+        console.log(`${s[v.leftSymbol].token}->`);
+        v.rightSymbol.forEach(function (v){
+            console.log(s[v].token);
+        });
+        console.log('\n');
+    });
+    
 }
