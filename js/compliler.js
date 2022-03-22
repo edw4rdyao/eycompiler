@@ -134,7 +134,7 @@ class LexicalAnalysis {
             }
             // error
             else{
-                throw "Undefined Symbol!";
+                throw `Undefined Symbol '${curString}', in (${curRow},${curRow})`;
             }
         }
     }

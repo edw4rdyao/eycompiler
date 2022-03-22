@@ -17,14 +17,14 @@
                     Input the source code
                 </div>
                 <div class="input-box">
-                    <textarea id="source-code" class="input-box-inner"
+                    <textarea id="source-code" class="input-box-inner" onkeyup="updateS1Button()"
                         placeholder="please type the source code..."></textarea>
                 </div>
                 <div>
                     <button class="s-button">
                         <input type="file" class="s-upload" id="s1-upload" onchange="uploadSource()">Upload
                     </button>
-                    <button class="s-button s-blue" id="s1-submit" onchange="updateS1Button()" onclick="lexicalResultDisplay()">Submit</button>
+                    <button class="s-button s-blue" disabled="disabled" id="s1-submit"  onclick="lexicalResultDisplay()">Submit</button>
                 </div>
             </div>
 
@@ -83,16 +83,12 @@
             document.getElementById('s1-split').style.display = 'none';
             document.getElementById('s2-lexical').style.display = 'none';
             document.getElementById('source-code').value = '';
+            updateS1Button();
         }
 
-        // function updateS1Button(){
-        //     if(document.getElementById('source-code').value == ''){
-        //         // document.getElementById('s1-submit');
-        //     }
-        //     else{
-        //         // document.getElementById('s1-submit').disabled = 'false';
-        //     }
-        // }
+        function updateS1Button(){
+            document.getElementById('s1-submit').disabled = (document.getElementById('source-code').value == '');
+        }
 
         // step1 upload the file
         function uploadSource() {
@@ -104,6 +100,7 @@
             }
             r.onload = function () {
                 document.getElementById('source-code').value = r.result;
+                updateS1Button();
             }
             r.readAsText(f.files[0]);
             f.value = '';
