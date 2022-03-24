@@ -160,7 +160,7 @@ class SemanticSymbol{
  */
 class IdentifierInfo{
     constructor(){
-
+        
     }
 }
 
@@ -354,7 +354,36 @@ class Grammar{
         return -1;
     }
     firstSetOfString(str){
-        
+        var sfs = new Set();
+        if(str.length == 0) return sfs;
+        var be = true;
+
+        // for every symbol
+        for(let i = 0; i < str.length; i ++){
+            let sifs = this.symbols[str[i]].firstSet;
+            // is teiminal
+            if(this.symbols[str[i]].type === 'terminal'){
+                this.mergeFirstSet(sfs, sifs);
+                be = false;
+                break;
+            }
+            // is empty
+            if(this.symbols[str[i]].type === 'empty'){
+                sfs.add(str[i]);
+                be = false;
+                break;
+            }
+            // is non terminal
+            this.mergeFirstSet(sfs, sifs);
+            // if can be empty, then loop
+            be = be && sifs.has(this.getSymbolIndex('@'));
+            if(!be) break;
+        }
+        // all can be empty
+        if(be){
+            sfs.add(this.getSymbolIndex('@'));
+        }
+        return sfs;
     }
     mergeFirstSet(des, src){
         let s = des.size;
@@ -395,6 +424,15 @@ class ItemLR1{
 class GrammarAnalysis{
     constructor(grammarSource){
         this.grammar = new Grammar(grammarSource);
+    }
+
+    genItemSet(){
+        // {S-> .Program, $}
+        var it = new ItemLR1(this.grammar.getSymbolIndex());
+    }
+
+    genGotoTable(){
+
     }
 
     get getProduction(){

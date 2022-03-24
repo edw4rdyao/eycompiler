@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/grammartree.css">
     <title>Compliler</title>
 </head>
 
@@ -21,14 +22,17 @@
                         placeholder="please type the source code..."></textarea>
                 </div>
                 <div>
-                    <button class="s-button">
+                    <button class="s-button s-blue s-fr" disabled="disabled" id="s1-submit"  onclick="lexicalResultDisplay()">Submit</button>
+                    <button class="s-button s-fr">
                         <input type="file" class="s-upload" id="s1-upload" onchange="uploadSource()">Upload
                     </button>
-                    <button class="s-button s-blue" disabled="disabled" id="s1-submit"  onclick="lexicalResultDisplay()">Submit</button>
+                    <div class="s-description">Type or upload. Please input c-like file.</div>
                 </div>
+                <div class="s-clear"></div>
             </div>
 
             <div class="s1-split" id="s1-split"></div>
+
             <div class="s-card s2-lexical" id="s2-lexical">
                 <div class="s-head">
                     Lexical analysis result
@@ -38,26 +42,52 @@
                     </table>
                 </div>
                 <div>
-                    <button class="s-button" id="s2-download">Download</button>
-                    <button class="s-button s-blue" id="s2-continue">Continue</button>
+                    <button class="s-button s-blue s-fr" id="s2-continue">Continue</button>
+                    <button class="s-button s-fr" id="s2-download">Download</button>
+                    <div class="s-description">Type is token kind, value is token string.</div>
                 </div>
+                <div class="s-clear"></div>
             </div>
-            <div class="s2-split"></div>
+
+            <div class="s2-split" id="s2-split"></div>
+
+            <div class="s-card s5-grammartree" id="s5-grammartree">
+                <div class="s-head">
+                    Grammar tree
+                </div>
+                <div class="s5-viewer" id="s5-viewer">
+
+                </div>
+                <div>
+                    <button class="s-button s-blue s-fr" id="s2-continue">Continue</button>
+                    <button class="s-button s-fr" id="s2-download">Download</button>
+                    <div class="s-description">Displayed by D3.js. Zoomable and collapsible.</div>
+                </div>
+                <div class="s-clear"></div>
+            </div>
+
+            <div class="s5-split" id="s5-split"></div>
+
         </div>
-        <div class="d-main">
+        <!-- <div class="d-main">
             <div class="s-card d1-intro">
                 <div class="s-head">
                     Wecome
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="s-clear"></div>
     </div>
-
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="./js/d3Tree.js"></script>
     <script src="./js/compliler.js"></script>
     <script src="./js/work.js"></script>
     <script>
-    //    test();
+        // document.getElementById('s1-split').style.display = 'block';
+        // document.getElementById('s2-lexical').style.display = 'block';
+        document.getElementById('s2-split').style.display = 'block';
+        document.getElementById('s5-split').style.display = 'block';
+        drawGrammarTree("../test/grammar_tree.json", 760, 480);
     </script>
 </body>
 

@@ -75,7 +75,7 @@ function lexicalResultDisplay() {
             </tr>';
     for(let i = 0; i < tS.length; i ++){
         t += `<tr><td>${tS[i].token}</td><td>${tS[i].value}</td><td>${tS[i].position.row}</td>\
-            <td>${tS[i].position.row}</td></tr>`;
+            <td>${tS[i].position.col}</td></tr>`;
     }
     document.getElementById('lexical-table').innerHTML = t;
 }

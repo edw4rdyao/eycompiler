@@ -1,13 +1,14 @@
 /* color theme */
 :root{
-    --first-bgc:        #f5f5f5;
+    --first-bgc:        #e8eaed;
     --second-bgc:       #ffffff;
     --third-bgc:        #d6d6d7;
     --third-bgc-hover:  #bdbdbd;
     --fourth-bgc:       rgb(81, 92, 216);
     --fourth-bgc-hover: rgb(64, 74, 179);
-    --fifth-bgc:        #eaf1fd;
+    --fifth-bgc:        #e8f0fe;
     --first-c:          #3d3d3d;
+    --second-c:          #5F6368;
     --card-border:      rgba(23, 23, 23, 0.2);
     --card-border-focus:rgb(59, 73, 223);
     --alert-border-focus:#f15f5f;
@@ -29,6 +30,11 @@
 @font-face {
     font-family: AzeretMono;
       src: url("../fonts/AzeretMono.ttf");
+}
+
+@font-face {
+    font-family: Sans;
+      src: url("../fonts/Sans.ttf");
 }
 
 /* scrollbar style */
@@ -71,10 +77,12 @@ input:focus, textarea:focus{
 
 .s-fl{
     float: left;
+    margin-right: 21px;
 }
 
 .s-fr{
     float: right;
+    margin-left: 21px;
 }
 
 .s-clear{
@@ -148,20 +156,28 @@ input:focus, textarea:focus{
 }
 
 .s-card{
-    box-shadow: 0px 2px 4px 1px var(--card-border);
+    box-shadow: 1px 2px 3px 1px var(--card-border);
     transition: all var(--transition-time);
     background-color: var(--second-bgc);
-    padding: 23px 40px;
+    padding: 21px 40px;
 }
 
 .s-card:hover{
     box-shadow:  0 0 1px 2px var(--card-border-focus);
 }
 
+.s-description{
+    font-weight: bold;
+    font-family: 'Sans';
+    width: 70%;
+    color: var(--second-c);
+}
+
 .s-head{
-    font-family: 'Fira';
-    font-size: 1.2em;
+    font-family: 'Sans';
+    font-size: 1.3em;
     text-align: center;
+    font-weight: bold;
 }
 
 .s-upload{
@@ -177,7 +193,6 @@ input:focus, textarea:focus{
 }
 
 .s-button{
-    display: inline-block;
     position: relative;
     padding: 8px 16px;
     border: none;
@@ -186,7 +201,6 @@ input:focus, textarea:focus{
     transition: all var(--transition-time);
     color: var(--first-c);
     font-family: 'Fira';
-    margin-right: 8px;
     cursor: pointer;
     min-width: 80px;
 }
@@ -278,6 +292,28 @@ input:focus, textarea:focus{
 }
 
 .s2-split{
+    background-image: url(../img/arrow.svg);
+    background-repeat: no-repeat;
+    background-position: 450px -30px;
+    height: 85px;
+    display: none;
+}
+
+.s5-grammartree{
+    border-radius: var(--border-radius-m);
+    margin: auto;
+}
+
+.s5-viewer{
+    background-color: var(--fifth-bgc);
+    margin: 20px auto;
+    border-radius: var(--border-radius-s);
+    height: 480px;
+    overflow: auto;
+    cursor:grab;
+}
+
+.s5-split{
     background-image: url(../img/arrow.svg);
     background-repeat: no-repeat;
     background-position: 450px -30px;
