@@ -22,7 +22,8 @@
                         placeholder="please type the source code..."></textarea>
                 </div>
                 <div>
-                    <button class="s-button s-blue s-fr" disabled="disabled" id="s1-submit"  onclick="lexicalResultDisplay()">Submit</button>
+                    <button class="s-button s-blue s-fr" disabled="disabled" id="s1-submit"
+                        onclick="lexicalResultDisplay()">Submit</button>
                     <button class="s-button s-fr">
                         <input type="file" class="s-upload" id="s1-upload" onchange="uploadSource()">Upload
                     </button>
@@ -31,7 +32,7 @@
                 <div class="s-clear"></div>
             </div>
 
-            <div class="s1-split" id="s1-split"></div>
+            <div class="s-split s1-split" id="s1-split"></div>
 
             <div class="s-card s2-lexical" id="s2-lexical">
                 <div class="s-head">
@@ -49,33 +50,36 @@
                 <div class="s-clear"></div>
             </div>
 
-            <div class="s2-split" id="s2-split"></div>
+            <div class="s-split s2-split" id="s2-split"></div>
 
             <div class="s-card s5-grammartree" id="s5-grammartree">
                 <div class="s-head">
                     Grammar tree
                 </div>
-                <div class="s5-viewer" id="s5-viewer">
-
-                </div>
+                <div class="s5-viewer" id="s5-viewer"></div>
+                <div class="s5-tooltips" id="tooltips"></div>
                 <div>
                     <button class="s-button s-blue s-fr" id="s2-continue">Continue</button>
                     <button class="s-button s-fr" id="s2-download">Download</button>
-                    <div class="s-description">Displayed by D3.js. Zoomable and collapsible.</div>
+                    <div class="s-description">Displayed by <a href="https://d3js.org.cn/">D3.js</a>. Zoomable and
+                        collapsible.</div>
                 </div>
                 <div class="s-clear"></div>
             </div>
 
-            <div class="s5-split" id="s5-split"></div>
+            <div class="s-split s5-split" id="s5-split"></div>
 
         </div>
-        <!-- <div class="d-main">
-            <div class="s-card d1-intro">
-                <div class="s-head">
-                    Wecome
-                </div>
+        <div class="d-main">
+            <div class="d1">
+                <h2>Eycomplier</h2>
+                <p>
+                    A online c-like Complier developed by JavaScript, including Lexical Analysis, <a
+                        href="http://www.cs.ecu.edu/karl/5220/spr16/Notes/Bottom-up/lr1.html">LR(1) Analysis</a>,
+                    Semantic Analysis and ASM Generation.
+                </p>
             </div>
-        </div> -->
+        </div>
         <div class="s-clear"></div>
     </div>
     <script src="https://d3js.org/d3.v3.min.js"></script>

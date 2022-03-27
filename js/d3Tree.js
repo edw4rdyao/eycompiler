@@ -79,6 +79,27 @@ function drawGrammarTree(treeDataFilePath, viewerWidth, viewerHeight){
             update(d);
             centerNode(d);
         }
+
+        var toolTips = document.getElementById("tooltips");
+
+        // mouse over to display tooltips
+        function mouseOver(d){
+            toolTips.style.visibility = "visible";
+            var t = "";
+            if(!d._children && !d.children){
+                t += "Type: Terminal"
+            }
+            else{
+                t += "Type: Nonterminal";
+            }
+            t += `<br>Value: "${d.name}"`;
+            toolTips.innerHTML = t;
+            toolTips.style.top = `${event.pageY - 20}px`;
+            toolTips.style.left = `${event.pageX + 20}px`;
+        }
+        function mouseOut(d){
+            toolTips.style.visibility = "hidden";
+        }
     
         function update(source) {
             // Compute the new height, function counts total children of root node and sets tree height accordingly.
@@ -129,11 +150,9 @@ function drawGrammarTree(treeDataFilePath, viewerWidth, viewerHeight){
                 .attr("r", 0)
                 .style("fill", function(d) {
                     return d._children ? "lightsteelblue" : "#fff";
-                });
-    
-            // phantom node to give us mouseover in a radius around it
-            nodeEnter.append("circle")
-                .attr('pointer-events', 'mouseover');
+                })
+                .on("mouseover", mouseOver)
+                .on("mouseout", mouseOut);
     
             // Change the circle fill depending on whether it has children and is collapsed
             node.select("circle.nodeCircle")
