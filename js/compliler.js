@@ -34,26 +34,26 @@ class LexicalAnalysis {
         const operatorTwo = ["==", ">=", "<=", "!="];
         const identifier = "<ID>";
         const constInt = "<INT>";
-        
+
         // analysis
         var curRow = 1, curCol = 0;
         var curString = "";
-        for(let i = 0; i < this.sources.length;){
-            curCol ++;
+        for (let i = 0; i < this.sources.length;) {
+            curCol++;
             // is blank
-            if(this.sources[i] === "\n"){
-                curRow ++;
+            if (this.sources[i] === "\n") {
+                curRow++;
                 curCol = 0;
-                i ++;
+                i++;
                 continue;
             }
-            else if(this.sources[i] === "\t"){
+            else if (this.sources[i] === "\t") {
                 curCol += 3;
-                i ++;
+                i++;
                 continue;
             }
-            else if(this.sources[i] === " "){
-                i ++;
+            else if (this.sources[i] === " ") {
+                i++;
                 continue;
             }
             // ia not blank
@@ -61,85 +61,85 @@ class LexicalAnalysis {
             var alpheRep = /^[a-zA-Z]$/;
             var numRep = /^[0-9]$/;
             // is alpha
-            if(alpheRep.test(curString)){
-                while(alpheRep.test(this.sources[i + 1]) || numRep.test(this.sources[i + 1])){
+            if (alpheRep.test(curString)) {
+                while (alpheRep.test(this.sources[i + 1]) || numRep.test(this.sources[i + 1])) {
                     curString += this.sources[i + 1];
-                    i ++;
-                    curCol ++;
+                    i++;
+                    curCol++;
                 }
-                i ++;
+                i++;
                 // is keyword
-                if(keyword.indexOf(curString) != -1){
+                if (keyword.indexOf(curString) != -1) {
                     let tmpToken = new Token(curString, curString, curRow, curCol - curString.length + 1);
                     this.tokenStream.push(tmpToken);
                 }
                 // is not keyword
-                else{
+                else {
                     let tmpToken = new Token(identifier, curString, curRow, curCol - curString.length + 1);
                     this.tokenStream.push(tmpToken);
                 }
             }
             // is digit
-            else if(numRep.test(curString)){
-                while(numRep.test(this.sources[i + 1])){
+            else if (numRep.test(curString)) {
+                while (numRep.test(this.sources[i + 1])) {
                     curString += this.sources[i + 1];
-                    i ++;
-                    curCol ++;
+                    i++;
+                    curCol++;
                 }
-                i ++;
+                i++;
                 let tmpToken = new Token(constInt, curString, curRow, curCol - curString.length + 1)
                 this.tokenStream.push(tmpToken);
             }
             // is separator
-            else if(separator.indexOf(curString) != -1){
+            else if (separator.indexOf(curString) != -1) {
                 let tmpToken = new Token(curString, curString, curRow, curCol);
                 this.tokenStream.push(tmpToken);
-                i ++;
+                i++;
             }
             // is one line comment
-            else if(curString === "/" && this.sources[i + 1] === "/"){
-                while(this.sources[i + 1] != "\n"){
-                    i ++;
+            else if (curString === "/" && this.sources[i + 1] === "/") {
+                while (this.sources[i + 1] != "\n") {
+                    i++;
                 }
-                i ++;
+                i++;
             }
             // is multiline comment
-            else if(curString === "/" && this.sources[i + 1] === "*"){
+            else if (curString === "/" && this.sources[i + 1] === "*") {
                 i += 2;
                 curCol += 2;
-                while(!(this.sources[i] === "*" && this.sources[i + 1] === "/")){
-                    curCol ++;
-                    if(this.sources[i] === "\n"){
-                        curRow ++;
+                while (!(this.sources[i] === "*" && this.sources[i + 1] === "/")) {
+                    curCol++;
+                    if (this.sources[i] === "\n") {
+                        curRow++;
                         curCol = 0;
                     }
-                    else if(this.sources[i] === "\t"){
+                    else if (this.sources[i] === "\t") {
                         curCol += 3;
                     }
-                    i ++;
+                    i++;
                 }
             }
             // is two operator
-            else if(operatorTwo.indexOf(curString + this.sources[i + 1]) != -1){
+            else if (operatorTwo.indexOf(curString + this.sources[i + 1]) != -1) {
                 curString += this.sources[i + 1];
                 i += 2;
                 let tmpToken = new Token(curString, curString, curRow, curCol - 1);
                 this.tokenStream.push(tmpToken);
             }
             // is one operator
-            else if(operatorOne.indexOf(curString) != -1){
-                i ++;
+            else if (operatorOne.indexOf(curString) != -1) {
+                i++;
                 let tmpToken = new Token(curString, curString, curRow, curCol);
                 this.tokenStream.push(tmpToken);
             }
             // error
-            else{
+            else {
                 throw `Undefined Symbol '${curString}', in (${curRow},${curCol})`;
             }
         }
     }
 
-    get getTokenStream(){
+    get getTokenStream() {
         return this.tokenStream;
     }
 }
@@ -148,8 +148,8 @@ class LexicalAnalysis {
  * @class: SemanticSymbol
  * @description: the symbol in analysis symbol table
  */
-class SemanticSymbol{
-    constructor(){
+class SemanticSymbol {
+    constructor() {
 
     }
 }
@@ -158,9 +158,9 @@ class SemanticSymbol{
  * @class: IdentifierInfo
  * @description: the information of identifier including var function...
  */
-class IdentifierInfo{
-    constructor(){
-        
+class IdentifierInfo {
+    constructor() {
+
     }
 }
 
@@ -169,8 +169,8 @@ class IdentifierInfo{
  * @description: the symbol table including glabal table, fuction table, block table
  *              temptable
  */
-class SemanticSymbolTable{
-    constructor(){
+class SemanticSymbolTable {
+    constructor() {
 
     }
 }
@@ -179,8 +179,8 @@ class SemanticSymbolTable{
  * @class: SymanticAnalysis
  * @description: the symantic analysis while grammar analysis.
  */
-class SymanticAnalysis{
-    constructor(){
+class SymanticAnalysis {
+    constructor() {
 
     }
 }
@@ -189,8 +189,8 @@ class SymanticAnalysis{
  * @class: GrammarSymbol
  * @description: the symbols in the grammar
  */
-class GrammarSymbol{
-    constructor(type, token){
+class GrammarSymbol {
+    constructor(type, token) {
         this.type = type;
         this.firstSet = new Set();
         this.followSet = new Set();
@@ -202,7 +202,7 @@ class GrammarSymbol{
  * @class: GrammarProduction
  * @description: the production in grammar e.g. A->BS
  */
-class GrammarProduction{
+class GrammarProduction {
     constructor(leftSymbol, rightSymbol) {
         this.leftSymbol = leftSymbol;
         this.rightSymbol = rightSymbol;
@@ -213,7 +213,7 @@ class GrammarProduction{
  * @class: Grammar
  * @description: the grammar of the sources
  */
-class Grammar{
+class Grammar {
     constructor(grammarSource) {
         this.symbols = [];
         this.terminal = [];
@@ -223,7 +223,7 @@ class Grammar{
         this.parserGrammar(grammarSource);
         this.getFirstSet();
     }
-    parserGrammar(grammarSource){
+    parserGrammar(grammarSource) {
         // add endToken #
         this.symbols.push(new GrammarSymbol('end', '#'));
         this.terminal.push(this.symbols.length - 1);
@@ -232,11 +232,11 @@ class Grammar{
 
         // for every production
         var allProductions = grammarSource.split('\n');
-        for(let i = 0; i < allProductions.length; i ++){
+        for (let i = 0; i < allProductions.length; i++) {
             // clear the blank in begin and end
             let tmpPro = allProductions[i].trim();
             let twoPart = tmpPro.split('->');
-            if(twoPart.length != 2){
+            if (twoPart.length != 2) {
                 throw 'grammar error!';
             }
             let productionLeft = twoPart[0].trim();
@@ -244,30 +244,30 @@ class Grammar{
 
             // split production right by '|'
             productionRight = productionRight.split('|');
-            if(productionRight.length === 0){
+            if (productionRight.length === 0) {
                 throw 'grammar error';
             }
-            
+
             // get index of left symbol
             let tmpProductionLeft = -1;
-            if(productionLeft != '@Declear'){
+            if (productionLeft != '@Declear') {
                 tmpProductionLeft = this.getSymbolIndex(productionLeft);
-                if(tmpProductionLeft == -1){
+                if (tmpProductionLeft == -1) {
                     this.symbols.push(new GrammarSymbol('nonTerminal', productionLeft));
                     tmpProductionLeft = this.symbols.length - 1;
                     this.nonTerminal.push(tmpProductionLeft);
                 }
             }
-            
-            if(tmpProductionLeft != -1){
+
+            if (tmpProductionLeft != -1) {
                 // for every production on right
-                for(let i = 0; i < productionRight.length; i ++){
+                for (let i = 0; i < productionRight.length; i++) {
                     let tmpProductionRight = [];
                     // split the every symbol in the right production
                     let everyRightSymbols = productionRight[i].trim().split(/ +/);
-                    for(let i = 0;  i < everyRightSymbols.length; i ++){
+                    for (let i = 0; i < everyRightSymbols.length; i++) {
                         let curRightSymbol = this.getSymbolIndex(everyRightSymbols[i]);
-                        if(curRightSymbol == -1){
+                        if (curRightSymbol == -1) {
                             // add to symbols
                             this.symbols.push(new GrammarSymbol('nonTerminal', everyRightSymbols[i].trim()));
                             this.nonTerminal.push(this.symbols.length - 1);
@@ -278,39 +278,39 @@ class Grammar{
                     // add to production in grammar
                     this.productions.push(new GrammarProduction(tmpProductionLeft, tmpProductionRight));
                     // first production
-                    if(this.symbols[tmpProductionLeft].token === 'S'){
+                    if (this.symbols[tmpProductionLeft].token === 'S') {
                         this.startProduction = this.productions.length - 1;
                     }
                 }
             }
-            else{
+            else {
                 // push the all terminal
-                for(let i = 0; i < productionRight.length; i ++){
+                for (let i = 0; i < productionRight.length; i++) {
                     this.symbols.push(new GrammarSymbol('terminal', productionRight[i].trim()));
                     this.terminal.push(this.symbols.length - 1);
                 }
             }
         }
     }
-    getFirstSet(){
+    getFirstSet() {
         var f = false;
-        while(true){
+        while (true) {
             f = false;
-            for(let i = 0; i < this.nonTerminal.length; i ++){
+            for (let i = 0; i < this.nonTerminal.length; i++) {
                 let nt = this.nonTerminal[i], ntfs = this.symbols[nt].firstSet;
-                for(let j = 0; j < this.productions.length; j ++){
-                    if(i == 1 && j == 1){
+                for (let j = 0; j < this.productions.length; j++) {
+                    if (i == 1 && j == 1) {
                         var a = 0;
                     }
                     let p = this.productions[j];
-                    if(p.leftSymbol != nt){
+                    if (p.leftSymbol != nt) {
                         continue;
                     }
                     p = this.productions[j].rightSymbol;
                     // the right is start by terminal or empty
-                    if(this.terminal.indexOf(p[0])!= -1 || this.symbols[p[0]].type === 'empty'){
+                    if (this.terminal.indexOf(p[0]) != -1 || this.symbols[p[0]].type === 'empty') {
                         // insert the symbol into firstset, and update flag
-                        if(!ntfs.has(p[0])){
+                        if (!ntfs.has(p[0])) {
                             ntfs.add(p[0]);
                             f = true;
                         }
@@ -318,57 +318,57 @@ class Grammar{
                     }
                     // the right is start by non terminal
                     let be = true;
-                    for(let k = 0; k < p.length; k ++){
+                    for (let k = 0; k < p.length; k++) {
                         let pk = p[k], pkfs = this.symbols[p[k]].firstSet;
                         // meet terminal
-                        if(this.terminal.indexOf(pk)!= -1){
+                        if (this.terminal.indexOf(pk) != -1) {
                             // merge the firstset
                             f = this.mergeFirstSet(ntfs, pkfs) || f;
                             be = false;
                             break;
                         }
-                        
+
                         f = this.mergeFirstSet(ntfs, pkfs) || f;
                         be = be && pkfs.has(this.getSymbolIndex('@'));
 
-                        if(!be) break;
+                        if (!be) break;
                     }
                     // can be empty
-                    if(be){
-                        if(!ntfs.has(this.getSymbolIndex('@'))){
+                    if (be) {
+                        if (!ntfs.has(this.getSymbolIndex('@'))) {
                             ntfs.add(this.getSymbolIndex('@'));
                             f = true;
                         }
                     }
                 }
             }
-            if(!f) break;
+            if (!f) break;
         }
     }
-    getSymbolIndex(str){
-        for(let i = 0;  i < this.symbols.length; i ++){
-            if(str === this.symbols[i].token){
+    getSymbolIndex(str) {
+        for (let i = 0; i < this.symbols.length; i++) {
+            if (str === this.symbols[i].token) {
                 return i;
             }
         }
         return -1;
     }
-    firstSetOfString(str){
+    firstSetOfString(str) {
         var sfs = new Set();
-        if(str.length == 0) return sfs;
+        if (str.length == 0) return sfs;
         var be = true;
 
         // for every symbol
-        for(let i = 0; i < str.length; i ++){
+        for (let i = 0; i < str.length; i++) {
             let sifs = this.symbols[str[i]].firstSet;
             // is teiminal
-            if(this.symbols[str[i]].type === 'terminal'){
+            if (this.symbols[str[i]].type === 'terminal') {
                 this.mergeFirstSet(sfs, sifs);
                 be = false;
                 break;
             }
             // is empty
-            if(this.symbols[str[i]].type === 'empty'){
+            if (this.symbols[str[i]].type === 'empty') {
                 sfs.add(str[i]);
                 be = false;
                 break;
@@ -377,23 +377,23 @@ class Grammar{
             this.mergeFirstSet(sfs, sifs);
             // if can be empty, then loop
             be = be && sifs.has(this.getSymbolIndex('@'));
-            if(!be) break;
+            if (!be) break;
         }
         // all can be empty
-        if(be){
+        if (be) {
             sfs.add(this.getSymbolIndex('@'));
         }
         return sfs;
     }
-    mergeFirstSet(des, src){
+    mergeFirstSet(des, src) {
         let s = des.size;
         let srcarr = Array.from(src);
-        for (let i = 0; i < Array.from(src).length; i ++) {
-            if(this.symbols[srcarr[i]].type != 'empty'){
+        for (let i = 0; i < srcarr.length; i++) {
+            if (this.symbols[srcarr[i]].type != 'empty') {
                 des.add(srcarr[i]);
             }
         }
-        if(s < des.size) return true;
+        if (s < des.size) return true;
         else return false;
     }
 }
@@ -402,51 +402,148 @@ class Grammar{
  * @class: LR(1) Item
  * @description: the item in LR(1) method A -> B.S
  */
-class ItemLR1{
-    constructor(leftSymbol, rightSymbol, proIndex, dotPosition, lookHead){
+class ItemLR1 {
+    constructor(leftSymbol, rightSymbol, proIndex, dotPosition, lookHead) {
         this.leftSymbol = leftSymbol;
         this.rightSymbol = rightSymbol;
         this.proIndex = proIndex;
         this.dotPosition = dotPosition;
         this.lookHead = lookHead;
     }
-    isEqual(tmpItem){
-        return (this.leftSymbol === tmpItem.leftSymbol && this.rightSymbol === tmpItem.rightSymbol && 
-                this.proIndex === tmpItem.proIndex && this.dotPosition === tmpItem.dotPosition &&
-                this.lookHead === tmpItem.lookHead);
-    }
 }
 
 /**
  * @class: GrammarAnalysis
- * @description: the grammar analysis, using input produce
+ * @description: the pocess of grammar analysis, using input produce
  */
-class GrammarAnalysis{
-    constructor(grammarSource){
-        this.grammar = new Grammar(grammarSource);
+class GrammarAnalysis extends Grammar {
+    constructor(grammarSource) {
+        super(grammarSource);
+        this.itemSetGroup = [];
     }
 
-    genItemSet(){
-        // {S-> .Program, $}
-        var it = new ItemLR1(this.grammar.getSymbolIndex());
+    genItemSetGroup() {
+        // init ItemSet({S-> .Program, $}) and push to itsg
+        var sp = this.productions[this.startProduction];
+        var it = new ItemLR1(sp.leftSymbol, sp.rightSymbol, this.startProduction, 0, this.getSymbolIndex('$'));
+        var its = [], itsg = this.itemSetGroup;
+        its.push(it);
+        itsg.push(this.genClosure(its));
+
+        // for every itemset in itemset group
+        for(let i = 0; i < itsg.length; i ++){
+            // for every symbol
+            for(let j = 0; j < this.symbols; j ++){
+                // termial or nonTerminal
+                if(this.symbols[j].type !== 'terminal' && this.symbols[j].type !== 'nonTermianl'){
+                    continue;
+                }
+                let toits = this.getGotoIts(itsg[i], j);
+                if(toits.length === 0){
+                    continue;
+                }
+                // !TODO
+
+
+            }
+        }
+
+
+
     }
 
-    genGotoTable(){
+    getClosure(its){
+        // every item
+        for(let i = 0; i < its.length; i ++){
+            let iti = its[i];
+            // . in the end
+            if(iti.dotPosition >= iti.rightSymbol.length){
+                continue;
+            }
+            // . next symbol
+            let ns = iti.rightSymbol[iti.dotPosition];
+            if(this.symbols[ns].type === 'terminal'){
+                continue;
+            }
+            if(this.symbols[ns].type === 'empty'){
+                iti.dotPosition ++;
+                continue;
+            }
+            // get firstset (A->α.Bβ, a) βa
+            let betaA = iti.rightSymbol.slice(iti.dotPosition + 1, iti.rightSymbol.length);
+            betaA.push(iti.lookHead);
+            let betaAFs = this.firstSetOfString(betaA);
+            // find the production begin by ns
+            for(let j = 0; j < this.productions.length; j ++){
+                let pj = this.productions[j];
+                if(pj.leftSymbol != ns){
+                    continue;
+                }
+                // push to its
+                for(let k = 0; k < betaAFs.size; k++){
+                    let fsk = (Array.from(betaAFs))[k];
+                    let ittmp = null;
+                    if(this.symbols[pj.rightSymbol[0]].type === 'empty'){
+                        ittmp = new ItemLR1(pj.leftSymbol, pj.rightSymbol, j, 1, fsk);
+                    }
+                    else{
+                        ittmp = new ItemLR1(pj.leftSymbol, pj.rightSymbol, j, 0, fsk);
+                    }
+                    // to sure there is not yet include this same item
+                    let s = 0;
+                    for(s = 0;  s < its.length; s ++){
+                        if(itemEqual(ittmp, its[s])) break;
+                    }
+                    if(s === its.length){
+                        its.push(ittmp);
+                    }
+                }
+            }
+        }
+        return its;
+    }
+
+    getGotoIts(ita, s){
 
     }
 
-    get getProduction(){
-        return this.grammar.productions;
+    genParsingTable() {
+
     }
 
-    get getSysmbol(){
-        return this.grammar.symbols;
+    itemEqual(ita, itb){
+        return ita.leftSymbol === itb.leftSymbol && JSON.stringify(ita.rightSymbol) === JSON.stringify(itb.rightSymbol) && 
+            ita.proIndex === itb.proIndex && ita.dotPosition === itb.dotPosition && ita.lookHead === itb.lookHead;
+    }
+
+    itemSetEqual(itsa, itsb){
+        if(itsa.length !== itsb.length){
+            return false;
+        }
+        var cnt = 0;
+        for(let i = 0; i < itsa.length; i ++){
+            for(let j = 0; j < itsb.length; j ++){
+                if(this.itemEqual(itsa[i], itsb[j])){
+                    cnt ++;
+                    break;
+                }
+            }
+        }
+        return cnt === itsa.length;
+    }
+
+    get getProduction() {
+        return this.productions;
+    }
+
+    get getSysmbol() {
+        return this.symbols;
     }
 }
 
 /**
- * @description: main fuction to work
- * @param: config
+ * @description: test fuction to work
+ * @param: null
  */
 function test() {
     var grammarSource = "\
@@ -490,12 +587,12 @@ function test() {
     console.log(p);
     var s = gA.getSysmbol;
     console.log(gA.getSysmbol);
-    p.forEach(function (v){
-        console.log(`${s[v.leftSymbol].token}->`);
-        v.rightSymbol.forEach(function (v){
-            console.log(s[v].token);
-        });
-        console.log('\n');
-    });
-    
+    // p.forEach(function (v) {
+    //     console.log(`${s[v.leftSymbol].token}->`);
+    //     v.rightSymbol.forEach(function (v) {
+    //         console.log(s[v].token);
+    //     });
+    //     console.log('\n');
+    // });
+
 }

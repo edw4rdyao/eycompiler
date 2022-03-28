@@ -276,11 +276,7 @@ input:focus, textarea:focus{
     padding: 10px;
 }
 
-.s1-input{
-
-}
-
-.s1-input .input-box{
+.input-box{
     margin: 20px auto;
     padding: 1px;
     border: none;
@@ -328,7 +324,7 @@ input:focus, textarea:focus{
 }
 
 .s5-grammartree{
-
+    display: none;
 }
 
 .s5-viewer{
