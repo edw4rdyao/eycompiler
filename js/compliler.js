@@ -293,6 +293,11 @@ class Grammar {
         }
     }
     getFirstSet() {
+        // for terminal
+        this.terminal.forEach((v)=>{
+            this.symbols[v].firstSet.add(v);
+        })
+        // for non terminal
         var f = false;
         while (true) {
             f = false;
@@ -420,36 +425,54 @@ class GrammarAnalysis extends Grammar {
     constructor(grammarSource) {
         super(grammarSource);
         this.itemSetGroup = [];
+        this.gotoInfo = [];
+        this.genItemSetGroup();
     }
 
     genItemSetGroup() {
         // init ItemSet({S-> .Program, $}) and push to itsg
         var sp = this.productions[this.startProduction];
-        var it = new ItemLR1(sp.leftSymbol, sp.rightSymbol, this.startProduction, 0, this.getSymbolIndex('$'));
+        var it = new ItemLR1(sp.leftSymbol, sp.rightSymbol, this.startProduction, 0, this.getSymbolIndex('#'));
         var its = [], itsg = this.itemSetGroup;
         its.push(it);
-        itsg.push(this.genClosure(its));
+        itsg.push(this.getClosure(its));
 
         // for every itemset in itemset group
         for(let i = 0; i < itsg.length; i ++){
             // for every symbol
-            for(let j = 0; j < this.symbols; j ++){
+            for(let j = 0; j < this.symbols.length; j ++){
                 // termial or nonTerminal
-                if(this.symbols[j].type !== 'terminal' && this.symbols[j].type !== 'nonTermianl'){
+                if(this.symbols[j].type !== 'terminal' && this.symbols[j].type !== 'nonTerminal'){
                     continue;
                 }
                 let toits = this.getGotoIts(itsg[i], j);
                 if(toits.length === 0){
                     continue;
                 }
-                // !TODO
-
+                // if already exist
+                let toid = itsg.findIndex((v)=>{
+                    return this.itemSetEqual(v, toits);
+                });
+                if(toid != -1){
+                    // record goto info
+                    this.gotoInfo.push({
+                        from: i,
+                        trans: j,
+                        goto: toid
+                    })
+                }
+                else{
+                    // add to itsg and record info
+                    this.itemSetGroup.push(toits);
+                    this.gotoInfo.push({
+                        from: i,
+                        trans: j,
+                        goto: this.itemSetGroup.length - 1,
+                    })
+                }
 
             }
         }
-
-
-
     }
 
     getClosure(its){
@@ -492,7 +515,7 @@ class GrammarAnalysis extends Grammar {
                     // to sure there is not yet include this same item
                     let s = 0;
                     for(s = 0;  s < its.length; s ++){
-                        if(itemEqual(ittmp, its[s])) break;
+                        if(this.itemEqual(ittmp, its[s])) break;
                     }
                     if(s === its.length){
                         its.push(ittmp);
@@ -503,8 +526,22 @@ class GrammarAnalysis extends Grammar {
         return its;
     }
 
-    getGotoIts(ita, s){
-
+    getGotoIts(itsa, s){
+        let itsb = [];
+        if(this.symbols[s].type !== 'terminal' && this.symbols[s].type !== 'nonTerminal'){
+            return itsb;
+        }
+        for(let i = 0; i < itsa.length; i ++){
+            let iti = itsa[i];
+            if(iti.dotPosition >= iti.rightSymbol.length){
+                continue;
+            }
+            if(iti.rightSymbol[iti.dotPosition] != s){
+                continue;
+            }
+            itsb.push(new ItemLR1(iti.leftSymbol,iti.rightSymbol, iti.proIndex, iti.dotPosition + 1, iti.lookHead));
+        }
+        return this.getClosure(itsb);
     }
 
     genParsingTable() {
@@ -538,6 +575,10 @@ class GrammarAnalysis extends Grammar {
 
     get getSysmbol() {
         return this.symbols;
+    }
+
+    get getItemSetGroup(){
+        return this.itemSetGroup;
     }
 }
 
@@ -585,14 +626,6 @@ function test() {
     var gA = new GrammarAnalysis(grammarSource);
     var p = gA.getProduction;
     console.log(p);
-    var s = gA.getSysmbol;
-    console.log(gA.getSysmbol);
-    // p.forEach(function (v) {
-    //     console.log(`${s[v.leftSymbol].token}->`);
-    //     v.rightSymbol.forEach(function (v) {
-    //         console.log(s[v].token);
-    //     });
-    //     console.log('\n');
-    // });
-
+    var itsg = gA.getItemSetGroup;
+    console.log(itsg);
 }
