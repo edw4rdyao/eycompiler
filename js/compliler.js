@@ -137,6 +137,8 @@ class LexicalAnalysis {
                 throw `Undefined Symbol '${curString}', in (${curRow},${curCol})`;
             }
         }
+        // add end symbol '#'
+        this.tokenStream.push(new Token('#', '#', -1, -1));
     }
 
     get getTokenStream() {
@@ -422,8 +424,10 @@ class ItemLR1 {
  * @description: the pocess of grammar analysis, using input produce
  */
 class GrammarAnalysis extends Grammar {
-    constructor(grammarSource) {
+    constructor(grammarSource, tokenStream) {
         super(grammarSource);
+        // the token stream to be parsed
+        this.tokenStream = tokenStream;
         // item set group I0~Ixx
         this.itemSetGroup = [];
         // goto and action table ralated
@@ -431,9 +435,44 @@ class GrammarAnalysis extends Grammar {
         this.actionTable = new Map();
         this.gotoTable = new Map();
         this.parserTable = [];
+        // information of analysis step
+        this.parseInfo = {
+            // stateStack
+            sts: [],
+            // symbolStack
+            sys: [],
+            // parse step
+            ps: 0,
+            // parse token stream index
+            pi: 0,
+            // parse is over
+            po: false
+        }
+
         // genarate item set group
         this.genItemSetGroup();
         this.genParsingTable();
+    }
+
+    itemEqual(ita, itb){
+        return ita.leftSymbol === itb.leftSymbol && JSON.stringify(ita.rightSymbol) === JSON.stringify(itb.rightSymbol) && 
+            ita.proIndex === itb.proIndex && ita.dotPosition === itb.dotPosition && ita.lookHead === itb.lookHead;
+    }
+
+    itemSetEqual(itsa, itsb){
+        if(itsa.length !== itsb.length){
+            return false;
+        }
+        var cnt = 0;
+        for(let i = 0; i < itsa.length; i ++){
+            for(let j = 0; j < itsb.length; j ++){
+                if(this.itemEqual(itsa[i], itsb[j])){
+                    cnt ++;
+                    break;
+                }
+            }
+        }
+        return cnt === itsa.length;
     }
 
     genItemSetGroup() {
@@ -639,25 +678,34 @@ class GrammarAnalysis extends Grammar {
         }
     }
 
-    itemEqual(ita, itb){
-        return ita.leftSymbol === itb.leftSymbol && JSON.stringify(ita.rightSymbol) === JSON.stringify(itb.rightSymbol) && 
-            ita.proIndex === itb.proIndex && ita.dotPosition === itb.dotPosition && ita.lookHead === itb.lookHead;
-    }
-
-    itemSetEqual(itsa, itsb){
-        if(itsa.length !== itsb.length){
-            return false;
+    analysisGrammarSemanticStep(){
+        var info = this.parseInfo;
+        var cs = info.sts[info.sts.length - 1];
+        // current token index in sysbolms
+        var cti = this.getSymbolIndex(this.tokenStream[info.pi].token);
+        if(cti === -1){
+            throw `Undefined Words ${this.tokenStream[info.pi].token}!`;
         }
-        var cnt = 0;
-        for(let i = 0; i < itsa.length; i ++){
-            for(let j = 0; j < itsb.length; j ++){
-                if(this.itemEqual(itsa[i], itsb[j])){
-                    cnt ++;
-                    break;
-                }
-            }
+        // find next action info in action table
+        var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
+        // parse the action
+        if(next == undefined){
+            throw `Can not Analysis!`;
         }
-        return cnt === itsa.length;
+        if(next.act === 'Shift'){
+            info.sys.push(cti);
+            info.sts.push(next.v);
+            // todo: semantical analysis
+        }
+        else if(next.act === 'Reduce'){
+            var proi = next.v;
+            var pro = this.productions[proi];
+            
+            // tode: semantical analysis
+        }
+        else if(next.act === 'Accept'){
+            info.po = true;
+        }
     }
 
     get getProduction() {
