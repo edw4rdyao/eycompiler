@@ -265,16 +265,16 @@ class Grammar {
                     let tmpProductionRight = [];
                     // split the every symbol in the right production
                     let everyRightSymbols = productionRight[i].trim().split(/ +/);
-                    for (let i = 0; i < everyRightSymbols.length; i++) {
-                        let curRightSymbol = this.getSymbolIndex(everyRightSymbols[i]);
-                        if (curRightSymbol == -1) {
+                    everyRightSymbols.forEach((v)=>{
+                        let curRightSymbol = this.getSymbolIndex(v);
+                        if(curRightSymbol === -1){
                             // add to symbols
-                            this.symbols.push(new GrammarSymbol('nonTerminal', everyRightSymbols[i].trim()));
+                            this.symbols.push(new GrammarSymbol('nonTerminal', v.trim()));
                             this.nonTerminal.push(this.symbols.length - 1);
                             curRightSymbol = this.symbols.length - 1;
                         }
                         tmpProductionRight.push(curRightSymbol);
-                    }
+                    })
                     // add to production in grammar
                     this.productions.push(new GrammarProduction(tmpProductionLeft, tmpProductionRight));
                     // first production
@@ -285,10 +285,10 @@ class Grammar {
             }
             else {
                 // push the all terminal
-                for (let i = 0; i < productionRight.length; i++) {
-                    this.symbols.push(new GrammarSymbol('terminal', productionRight[i].trim()));
+                productionRight.forEach((v)=>{
+                    this.symbols.push(new GrammarSymbol('terminal', v.trim()));
                     this.terminal.push(this.symbols.length - 1);
-                }
+                })
             }
         }
     }
@@ -424,9 +424,16 @@ class ItemLR1 {
 class GrammarAnalysis extends Grammar {
     constructor(grammarSource) {
         super(grammarSource);
+        // item set group I0~Ixx
         this.itemSetGroup = [];
-        this.gotoInfo = [];
+        // goto and action table ralated
+        this.gotoInfo = new Map();
+        this.actionTable = new Map();
+        this.gotoTable = new Map();
+        this.parserTable = [];
+        // genarate item set group
         this.genItemSetGroup();
+        this.genParsingTable();
     }
 
     genItemSetGroup() {
@@ -455,20 +462,12 @@ class GrammarAnalysis extends Grammar {
                 });
                 if(toid != -1){
                     // record goto info
-                    this.gotoInfo.push({
-                        from: i,
-                        trans: j,
-                        goto: toid
-                    })
+                    this.gotoInfo.set(i.toString() + ',' + j.toString(), toid);
                 }
                 else{
                     // add to itsg and record info
                     this.itemSetGroup.push(toits);
-                    this.gotoInfo.push({
-                        from: i,
-                        trans: j,
-                        goto: this.itemSetGroup.length - 1,
-                    })
+                    this.gotoInfo.set(i.toString() + ',' + j.toString(), this.itemSetGroup.length - 1);
                 }
 
             }
@@ -545,7 +544,99 @@ class GrammarAnalysis extends Grammar {
     }
 
     genParsingTable() {
-
+        // for every its in itsg, gen goto and action table
+        for(let i = 0; i < this.itemSetGroup.length; i ++){
+            // for every item
+            let itsi = this.itemSetGroup[i];
+            for(let j = 0; j < itsi.length; j ++){
+                let itj = itsi[j];
+                if(itj.dotPosition >= itj.rightSymbol.length){
+                    if(this.symbols[itj.leftSymbol].token !== 'S'){
+                        // reduce
+                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(),{
+                            act: 'Reduce',
+                            v: itj.proIndex
+                        });
+                    }
+                    else{
+                        // accept
+                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(),{
+                            act: 'Accept',
+                            v: -1
+                        })
+                    }
+                }
+                else{
+                    // next symbol
+                    let nts = itj.rightSymbol[itj.dotPosition];
+                    // find in goto info
+                    let gt = this.gotoInfo.get(i.toString() + ',' + nts.toString());
+                    if(gt != undefined){
+                        // add to goto table
+                        if(this.symbols[nts].type === 'nonTerminal'){
+                            this.gotoTable.set(i.toString() + ',' + nts.toString(),{
+                                act: 'Shift',
+                                v: gt
+                            })
+                        }
+                        // add to action table
+                        else if(this.symbols[nts].type === 'terminal'){
+                            this.actionTable.set(i.toString() + ',' + nts.toString(),{
+                                act: 'Shift',
+                                v: gt
+                            })
+                        }
+                    }
+                }
+            }
+        }
+        // for every its in itsg, sort for every symbol
+        for(let i = 0; i < this.itemSetGroup.length; i ++){
+            let tableInfo = [];
+            // for every terminal
+            this.terminal.forEach((v)=>{
+                let gt = this.actionTable.get(i.toString() + ',' + v.toString());
+                let lb = '';
+                if(gt != undefined){
+                    if(gt.act === 'Accept'){
+                        lb = 'acc';
+                    }
+                    else if(gt.act === 'Reduce'){
+                        lb = ('r' + gt.v);
+                    }
+                    else if(gt.act === 'Shift'){
+                        lb = ('s' + gt.v);
+                    }
+                }
+                else{
+                    lb = 'err';
+                }
+                tableInfo.push({
+                    s: this.symbols[v].token,
+                    lable: lb
+                })
+            })
+            // for every non terminal
+            for(let j = 0; j < this.nonTerminal.length; j ++){
+                let ntj = this.nonTerminal[j];
+                if(this.symbols[ntj].token === 'S'){
+                    continue;
+                }
+                let gt = this.gotoTable.get(i.toString() + ',' + ntj.toString());
+                let lb = '';
+                if(gt != undefined){
+                    lb = gt.v.toString();
+                }
+                else{
+                    lb = 'err';
+                }
+                tableInfo.push({
+                    s: this.symbols[ntj].token,
+                    lable: lb
+                })
+            }
+            this.parserTable.push(tableInfo);
+        }
     }
 
     itemEqual(ita, itb){
@@ -579,6 +670,10 @@ class GrammarAnalysis extends Grammar {
 
     get getItemSetGroup(){
         return this.itemSetGroup;
+    }
+
+    get getParserTable(){
+        return this.parserTable;
     }
 }
 
@@ -628,4 +723,5 @@ function test() {
     console.log(p);
     var itsg = gA.getItemSetGroup;
     console.log(itsg);
+    console.log(gA.getParserTable);
 }
