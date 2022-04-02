@@ -98,16 +98,16 @@ class LexicalAnalysis {
             }
             // is one line comment
             else if (curString === "/" && this.sources[i + 1] === "/") {
-                while (this.sources[i + 1] != "\n") {
+                while (i + 1 < this.sources.length && this.sources[i + 1] != "\n") {
                     i++;
                 }
-                i++;
+                i += 2;
             }
             // is multiline comment
             else if (curString === "/" && this.sources[i + 1] === "*") {
                 i += 2;
                 curCol += 2;
-                while (!(this.sources[i] === "*" && this.sources[i + 1] === "/")) {
+                while (i + 1 < this.sources.length && !(this.sources[i] === "*" && this.sources[i + 1] === "/")) {
                     curCol++;
                     if (this.sources[i] === "\n") {
                         curRow++;
@@ -118,6 +118,7 @@ class LexicalAnalysis {
                     }
                     i++;
                 }
+                i += 2;
             }
             // is two operator
             else if (operatorTwo.indexOf(curString + this.sources[i + 1]) != -1) {
@@ -134,7 +135,7 @@ class LexicalAnalysis {
             }
             // error
             else {
-                throw `Undefined Symbol '${curString}', in (${curRow},${curCol})`;
+                throw `Lexical Error: Undefined Symbol '${curString}', in (${curRow},${curCol})`;
             }
         }
         // add end symbol '#'
@@ -448,10 +449,12 @@ class GrammarAnalysis extends Grammar {
             // parse is over
             po: false
         }
+        this.grammarTree = null;
 
         // genarate item set group
         this.genItemSetGroup();
         this.genParsingTable();
+        this.analysisGrammarSemantic();
     }
 
     itemEqual(ita, itb){
@@ -678,34 +681,113 @@ class GrammarAnalysis extends Grammar {
         }
     }
 
+    analysisGrammarSemantic(){
+        // init the user parse infomation
+        this.parseInfo.sys.push(this.getSymbolIndex('#'));
+        this.parseInfo.sts.push(0);
+        // system parse infomation
+        var sys = [this.getSymbolIndex('#')];
+        var sts = [0];
+        var tns = [];
+        // for every token
+        for(let i = 0; i < this.tokenStream.length; i ++){
+            var cs = sts[sts.length - 1];
+            // current token index in sysbolms
+            var tokenpi = this.tokenStream[i];
+            var cti = this.getSymbolIndex(tokenpi.token);
+            if(cti === -1){
+                throw `Grammar Error: Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col})`;
+            }
+            // find next action info in action table
+            var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
+            // parse the action
+            if(next == undefined){
+                throw `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`;
+            }
+            if(next.act === 'Shift'){
+                sys.push(cti);
+                sts.push(next.v);
+                // push tree node
+                tns.push({
+                    name: tokenpi.token
+                })
+                // todo: semantical analysis
+            }
+            else if(next.act === 'Reduce'){
+                var proi = next.v;
+                var pro = this.productions[proi];
+                var tnc = [];
+                // empty need not pop
+                if(this.symbols[pro.rightSymbol[0]].type !== 'empty'){
+                    for(let i = 0; i < pro.rightSymbol.length; i ++){
+                        sts.pop();
+                        sys.pop();
+                        tnc.push(tns.pop());
+                    }
+                }
+                // search the goto table
+                next = this.gotoTable.get(sts[sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
+                if(next == undefined){
+                    throw `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`;
+                }
+                // push in
+                sys.push(pro.leftSymbol);
+                sts.push(next.v);
+                // genarate grammar tree data
+                var tn = {
+                    name: this.symbols[pro.leftSymbol].token
+                }
+                if(tnc.length !== 0){
+                    tn.children = tnc.reverse();
+                    
+                }
+                tns.push(tn);
+
+                i --;
+                // todo: semantical analysis
+            }
+            else if(next.act === 'Accept'){
+                this.grammarTree = tns[0];
+                return ;
+            }
+        }
+    }
+
     analysisGrammarSemanticStep(){
         var info = this.parseInfo;
         var cs = info.sts[info.sts.length - 1];
         // current token index in sysbolms
-        var cti = this.getSymbolIndex(this.tokenStream[info.pi].token);
-        if(cti === -1){
-            throw `Undefined Words ${this.tokenStream[info.pi].token}!`;
-        }
+        var tokenpi = this.tokenStream[info.pi];
+        var cti = this.getSymbolIndex(tokenpi.token);
         // find next action info in action table
         var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
         // parse the action
-        if(next == undefined){
-            throw `Can not Analysis!`;
-        }
         if(next.act === 'Shift'){
             info.sys.push(cti);
             info.sts.push(next.v);
-            // todo: semantical analysis
         }
         else if(next.act === 'Reduce'){
             var proi = next.v;
             var pro = this.productions[proi];
-            
-            // tode: semantical analysis
+            // empty need not pop
+            if(this.symbols[pro.rightSymbol[0]].type !== 'empty'){
+                for(let i = 0; i < pro.rightSymbol.length; i ++){
+                    info.sts.pop();
+                    info.sys.pop();
+                }
+            }
+            // search the goto table
+            next = this.gotoTable.get(info.sts[info.sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
+            // push in
+            info.sys.push(pro.leftSymbol);
+            info.sts.push(next.v);
+            info.pi --;
         }
         else if(next.act === 'Accept'){
             info.po = true;
+            return true;
         }
+        return false;
     }
 
     get getProduction() {
@@ -723,53 +805,4 @@ class GrammarAnalysis extends Grammar {
     get getParserTable(){
         return this.parserTable;
     }
-}
-
-/**
- * @description: test fuction to work
- * @param: null
- */
-function test() {
-    var grammarSource = "\
-        @Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==\
-        \nS -> Program\
-        \nProgram -> ExtDefList \
-        \nExtDefList -> ExtDef ExtDefList | @\
-        \nExtDef -> VarSpecifier <ID> ; | FunSpecifier FunDec Block\
-        \nVarSpecifier -> int\
-        \nFunSpecifier -> void | int \
-        \nFunDec -> <ID> CreateFunTable_m ( VarList )\
-        \nCreateFunTable_m -> @\
-        \nVarList -> ParamDec , VarList | ParamDec | @\
-        \nParamDec -> VarSpecifier <ID>\
-        \nBlock -> { DefList StmtList }\
-        \nDefList -> Def DefList | @\
-        \nDef -> VarSpecifier <ID> ;\
-        \nStmtList -> Stmt StmtList | @\
-        \nStmt -> AssignStmt ; | ReturnStmt ; | IfStmt | WhileStmt | CallStmt ;\
-        \nAssignStmt -> <ID> = Exp\
-        \nExp -> AddSubExp | Exp Relop AddSubExp\
-        \nAddSubExp -> Item | Item + Item | Item - Item\
-        \nItem -> Factor | Factor * Factor | Factor / Factor\
-        \nFactor -> <INT> | ( Exp ) | <ID> | CallStmt\
-        \nCallStmt -> <ID> ( CallFunCheck Args )\
-        \nCallFunCheck -> @\
-        \nArgs -> Exp , Args | Exp | @\
-        \nReturnStmt -> return Exp | return\
-        \nRelop -> > | < | >= | <= | == | !=\
-        \nIfStmt -> if IfStmt_m1 ( Exp ) IfStmt_m2 Block IfNext\
-        \nIfStmt_m1 -> @\
-        \nIfStmt_m2 -> @\
-        \nIfNext -> @ | IfStmt_next else Block\
-        \nIfStmt_next -> @\
-        \nWhileStmt -> while WhileStmt_m1 ( Exp ) WhileStmt_m2 Block\
-        \nWhileStmt_m1 -> @\
-        \nWhileStmt_m2 -> @\
-    ";
-    var gA = new GrammarAnalysis(grammarSource);
-    var p = gA.getProduction;
-    console.log(p);
-    var itsg = gA.getItemSetGroup;
-    console.log(itsg);
-    console.log(gA.getParserTable);
 }

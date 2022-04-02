@@ -19,22 +19,23 @@ int program(int a,int b, int c)
 	return i;
 }
 
-int demo(int a)
-{
-	a=a+2;
-	return a*2;
-}
+// int demo(int a)
+// {
+// 	a=a+2;
+// 	return a*2;
+// }
 //aaaaaaaaaaaaaaaa
 /*aaaaa
 qqq
-*/  void main()
-{
-	int a;
-	int b;
-	int c;
-	a=3;
-	b=4;
-	c=2;
-	a=program(a,b,demo(c));
-	return ;
-}
+// */  
+// void main()
+// {
+// 	int a;
+// 	int b;
+// 	int c;
+// 	a=3;
+// 	b=4;
+// 	c=2;
+// 	a=program(a,b,demo(c));
+// 	return ;
+// }

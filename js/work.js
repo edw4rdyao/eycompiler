@@ -4,7 +4,7 @@
  */
 
 // var
-var lA, tS;
+var lA, tS, gA;
 
 // my alert
 function sAlert(e) {
@@ -78,4 +78,51 @@ function lexicalResultDisplay() {
             <td>${tS[i].position.col}</td></tr>`;
     }
     document.getElementById('lexical-table').innerHTML = t;
+
+    // test
+    test();
+}
+
+/**
+ * @description: test fuction to work
+ * @param: null
+ */
+ function test() {
+    var grammarSource = "\
+        @Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==\
+        \nS -> Program\
+        \nProgram -> ExtDefList \
+        \nExtDefList -> ExtDef ExtDefList | @\
+        \nExtDef -> VarSpecifier <ID> ; | FunSpecifier FunDec Block\
+        \nVarSpecifier -> int\
+        \nFunSpecifier -> void | int \
+        \nFunDec -> <ID> CreateFunTable_m ( VarList )\
+        \nCreateFunTable_m -> @\
+        \nVarList -> ParamDec , VarList | ParamDec | @\
+        \nParamDec -> VarSpecifier <ID>\
+        \nBlock -> { DefList StmtList }\
+        \nDefList -> Def DefList | @\
+        \nDef -> VarSpecifier <ID> ;\
+        \nStmtList -> Stmt StmtList | @\
+        \nStmt -> AssignStmt ; | ReturnStmt ; | IfStmt | WhileStmt | CallStmt ;\
+        \nAssignStmt -> <ID> = Exp\
+        \nExp -> AddSubExp | Exp Relop AddSubExp\
+        \nAddSubExp -> Item | Item + Item | Item - Item\
+        \nItem -> Factor | Factor * Factor | Factor / Factor\
+        \nFactor -> <INT> | ( Exp ) | <ID> | CallStmt\
+        \nCallStmt -> <ID> ( CallFunCheck Args )\
+        \nCallFunCheck -> @\
+        \nArgs -> Exp , Args | Exp | @\
+        \nReturnStmt -> return Exp | return\
+        \nRelop -> > | < | >= | <= | == | !=\
+        \nIfStmt -> if IfStmt_m1 ( Exp ) IfStmt_m2 Block IfNext\
+        \nIfStmt_m1 -> @\
+        \nIfStmt_m2 -> @\
+        \nIfNext -> @ | IfStmt_next else Block\
+        \nIfStmt_next -> @\
+        \nWhileStmt -> while WhileStmt_m1 ( Exp ) WhileStmt_m2 Block\
+        \nWhileStmt_m1 -> @\
+        \nWhileStmt_m2 -> @\
+    ";
+    gA = new GrammarAnalysis(grammarSource, tS);
 }
