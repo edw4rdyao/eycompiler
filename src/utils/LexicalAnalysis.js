@@ -130,7 +130,10 @@ export default class LexicalAnalysis {
             }
             // error
             else {
-                throw `Lexical Error: Undefined Symbol '${curString}', in (${curRow},${curCol})`;
+                throw {
+                    code: 100,
+                    msg: `Lexical Error: Undefined Symbol '${curString}', in (${curRow},${curCol})`
+                }
             }
         }
         // add end symbol '#'

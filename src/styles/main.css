@@ -29,7 +29,7 @@
 /* fonts */
 @font-face {
     font-family: Fira;
-      src: url("../assets/fonts/FiraCode.ttf");
+    src: url("../assets/fonts/FiraCode.ttf");
 }
 
 @font-face {
@@ -155,14 +155,15 @@ input:focus, textarea:focus{
     width: 20%;
     float: left;
     margin: auto;
+    /* position: sticky;
+    top: 50px; */
 }
 
-.d1{
+.des{
     font-family: 'Boing';
     background-color: var(--sixth-bgc);
     margin: auto;
-    position: sticky;
-    top: 0;
+    margin-bottom: 50px;
 }
 
 .d1 h2{
@@ -177,6 +178,29 @@ input:focus, textarea:focus{
     font-weight: bold;
     margin: 1em 0;
     line-height: 1.4em;
+}
+
+
+.d2 h2{
+    margin: 0;
+    padding: 0;
+    font-size: 2em;
+    color: var(#000000);
+}
+
+.d2 p{
+    font-family: 'Sans';
+    font-weight: bold;
+    margin: 1em 0;
+    line-height: 1.4em;
+}
+
+.d-tag{
+    display: inline-block;
+    margin:  3px 5px 3px 0px;
+    background-color: var(--second-bgc);
+    padding: 0px 8px;
+    border-radius: var(--border-radius-s);
 }
 
 .s-main{
@@ -272,7 +296,7 @@ input:focus, textarea:focus{
 }
 
 .s-table th{
-    padding: 10px;
+    padding: 11px;
 }
 
 .input-box{
@@ -319,8 +343,32 @@ input:focus, textarea:focus{
     background-position: 450px -30px;
 }
 
-.s5-grammartree{
-    display: none;
+.s4-table-box{
+    background-color: var(--fifth-bgc);
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: var(--border-radius-s);
+    overflow: auto;
+    max-height: 400px;
+}
+
+.s4-parsertable{
+    font-size: .4em;
+}
+
+.s4-parsertable th{
+    padding: 8px;
+    background-color: var(--third-bgc);
+    border: solid 1.2px #4f4f4f82;
+}
+
+.s4-parsertable td{
+    border: solid .9px #4f4f4f82;
+}
+
+.s4-noterr{
+    color: var(--third-c);
+    font-weight: bold;
 }
 
 .s5-viewer{
@@ -336,11 +384,12 @@ input:focus, textarea:focus{
     position: absolute;
     background-color: var(--second-bgc);
     padding: 9px;
-    border-radius: var(--border-radius-s);
+    border-radius: var(--border-radius-m);
     visibility: hidden;
     font-family: 'Sans';
     font-weight: bold;
     font-size: .9em;
+    box-shadow: 1px 1px 2px 1px var(--card-border);
 }
 
 .s5-split{

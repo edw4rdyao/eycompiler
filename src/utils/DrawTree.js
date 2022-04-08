@@ -5,11 +5,18 @@
  * @description: draw the collapsible grammar tree by d3.js
  */
 
-function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
+import d3 from "d3";
+
+export default function drawGrammarTree(grammarTreeData, containerId, treeSvgId) {
+    
+    
+    // if(document.getElementById(treeSvgId)) return ;
+    
     // Misc. variables
     var i = 0;
     var duration = 700;
     var root;
+    var viewerWidth = 760, viewerHeight = 480;
 
     var tree = d3.layout.tree(grammarTreeData)
         .size([viewerWidth, viewerHeight]);
@@ -29,7 +36,8 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
     var zoomListener = d3.behavior.zoom().scaleExtent([0.7, 1.4]).on("zoom", zoom);
 
     // define the baseSvg, attaching a class for styling and the zoomListener
-    var baseSvg = d3.select("#s5-viewer").append("svg")
+    var baseSvg = d3.select("#"+containerId).append("svg")
+        .attr("id",treeSvgId)
         .attr("class", "overlay")
         .call(zoomListener);
 
@@ -37,18 +45,18 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
     function collapse(d) {
         if (d.children) {
             d._children = d.children;
-            d._children.forEach(collapse);
+            d._children.forEach(collapse)
             d.children = null;
         }
     }
 
     // Function to center node when clicked so node doesn't get lost when collapsing/moving with large amount of children.
     function centerNode(source) {
-        scale = zoomListener.scale();
-        x = -source.x0;
-        y = -source.y0;
-        x = x * scale + viewerWidth / 2;
-        y = y * scale + viewerHeight / 2;
+        var scale = zoomListener.scale();
+        var x = -source.x0;
+        var y = -source.y0;
+        var x = x * scale + viewerWidth / 2;
+        var y = y * scale + viewerHeight / 2;
         d3.select('g').transition()
             .duration(duration)
             .attr("transform", "translate(" + x + "," + y + ")scale(" + scale + ")");
@@ -70,6 +78,7 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
 
     // Toggle children on click.
     function click(d) {
+        if (d3.event.defaultPrevented) return; // click suppressed
         d = toggleChildren(d);
         update(d);
         centerNode(d);
@@ -89,8 +98,8 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
         }
         t += `<br>Value: "${d.name}"`;
         toolTips.innerHTML = t;
-        toolTips.style.top = `${event.pageY - 20}px`;
-        toolTips.style.left = `${event.pageX + 20}px`;
+        toolTips.style.top = `${d3.event.pageY - 20}px`;
+        toolTips.style.left = `${d3.event.pageX + 20}px`;
     }
     function mouseOut(d) {
         toolTips.style.visibility = "hidden";
@@ -144,7 +153,7 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
             .attr('class', 'nodeCircle')
             .attr("r", 0)
             .style("fill", function (d) {
-                return d._children ? "lightsteelblue" : "#fff";
+                return (d._children || d.children) ? "lightsteelblue" : "#fff";
             })
             .on("mouseover", mouseOver)
             .on("mouseout", mouseOut);
@@ -153,7 +162,7 @@ function drawGrammarTree(grammarTreeData, viewerWidth, viewerHeight) {
         node.select("circle.nodeCircle")
             .attr("r", 8)
             .style("fill", function (d) {
-                return d._children ? "lightsteelblue" : "#fff";
+                return (d._children || d.children) ? "lightsteelblue" : "#fff";
             });
 
         // Transition nodes to their new position.

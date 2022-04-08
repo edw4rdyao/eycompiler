@@ -27,16 +27,41 @@
     stroke-width: 2.5px;
 }
 
-.ghostCircle{
-    display: none;
-}
-
 .node-display{
     font-size: 0.5em;
-    font-family:'AzeretMono';
     position: absolute;
     top: 0;
     left: 20px;
     display: block;
     background-color: #fff;
 }
+
+/* .node>circle{
+    r:8;
+    stroke: rgb(81, 92, 216);
+    stroke-width: 2px;
+    transition: .2s;
+}
+
+.node>circle:hover{
+    r: 11px;
+    stroke-width: 3px;
+}
+
+.node-root>circle{
+    fill: lightblue;
+}
+
+.node-branch>circle{
+    fill: lightblue;
+}
+
+.node-leaf>circle{
+    fill: white;
+}
+
+.link{
+    fill: none;
+    stroke: #848484!important;
+    stroke-width: 2.5px;
+} */

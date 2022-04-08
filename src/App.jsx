@@ -1,5 +1,5 @@
 import './styles/main.css'
-
+import './styles/grammartree.css'
 import Complier from './Complier';
 import Description from './Description';
 

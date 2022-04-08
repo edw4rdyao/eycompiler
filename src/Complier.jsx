@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 
-import InputBox from './steps/InputBox'
+import InputBox from './components/InputBox'
 import Split from './components/Split'
-import LexicalResult from './steps/LexicalResult'
+import TableResult from './components/TableResult'
+import GrammarTree from './components/GrammarTree'
 import Alert from './components/Alert'
 
 import LexicalAnalysis from './utils/LexicalAnalysis'
@@ -18,8 +19,10 @@ export default class Complier extends Component {
         super(props);
         this.state = {
             process: 1,
-            err: false,
-            errMsg: ''
+            err: {
+                code: -1,
+                msg: ''
+            }
         }
     }
 
@@ -29,6 +32,18 @@ export default class Complier extends Component {
         })
     }
 
+    getNewProcess(errCode){
+        if(errCode >= 100 && errCode < 200){
+            return 1;
+        }
+        else if(errCode >= 200 && errCode < 300){
+            return 3;
+        }
+        else if(errCode >= 300 && errCode < 400){
+            return 4;
+        }
+    }
+
     handleSubmitSource(sources) {
         complier.lA = new LexicalAnalysis(sources);
         try {
@@ -36,8 +51,10 @@ export default class Complier extends Component {
             this.setProcess(2);
         } catch (e) {
             this.setState({
-                err: true,
-                errMsg: e
+                err: {
+                    code: e.code,
+                    msg: e.msg
+                }
             })
             return;
         }
@@ -45,27 +62,55 @@ export default class Complier extends Component {
 
     handleSubmitGrammar(grammar){
         try{
-            complier.gA = new GrammarAnalysis(grammar);
-            
+            complier.gA = new GrammarAnalysis(grammar, complier.lA.getTokenStream);
+            this.setProcess(4);
         }
         catch(e){
-
+            this.setState({
+                err: {
+                    code: e.code,
+                    msg: e.msg
+                }
+            })
             return;
         }
     }
     
-    handleErrClose(){
+    handleContinueAnalysis(){
+        try{
+            if(complier.gA){
+                complier.gA.analysisGrammarSemantic();
+                this.setProcess(5);
+            }
+        }
+        catch(e){
+            this.setState({
+                err: {
+                    code: e.code,
+                    msg: e.msg
+                }
+            })
+            return;
+        }
+    }
+
+    handleErrClose(newProcess){
         this.setState({
-            err: false,
-            errMsg: ''
+            process: newProcess,
+            err:{
+                code: -1,
+                msg: ''
+            }
         })
     }
 
     handleErrReset(){
         this.setState({
             process: 1,
-            err: false,
-            errMsg: '',
+            err:{
+                code: -1,
+                msg: ''
+            }
         })
         complier = {
             lA: null,
@@ -76,9 +121,10 @@ export default class Complier extends Component {
     render() {
         return (
             <div className="s-main">
-                {this.state.err ?
+                {(this.state.err.code !== -1) ?
                     <Alert
-                        errMsg={this.state.errMsg}
+                        errMsg={this.state.err.msg}
+                        newProcess={this.getNewProcess(this.state.err.code)}
                         handleErrClose={this.handleErrClose.bind(this)}
                         handleErrReset={this.handleErrReset.bind(this)}
                     ></Alert> : null}
@@ -92,14 +138,17 @@ export default class Complier extends Component {
 
                 {this.state.process >= 2 ? <>
                     <Split x={300} y={-30}></Split>
-                    <LexicalResult
-                        tokenStream={(complier.lA == null) ? [] : complier.lA.getTokenStream}
+                    <TableResult
+                        header={'Lexical Analysis Result'}
+                        type={'lexicalResult'}
+                        tableData={(complier.lA == null) ? [] : complier.lA.getTokenStream}
+                        description={'Type is token kind, value is token string.'}
                         handleContinue={()=>{
                             this.setState({
                                 process:3
                             })
                         }}
-                    ></LexicalResult>
+                    ></TableResult>
                 </> : null}
                 {this.state.process >= 3? <>
                     <Split x={400} y={-30}></Split>
@@ -110,7 +159,22 @@ export default class Complier extends Component {
                         handleSubmit={this.handleSubmitGrammar.bind(this)}
                     ></InputBox>
                 </>:null}
-
+                {this.state.process >= 4? <>
+                    <Split x={250} y={-30}></Split>
+                    <TableResult
+                        header={'LR(1) Analysis Table'}
+                        type={'lr1Table'}
+                        tableData={complier.gA ? complier.gA.getParserTable:[]}
+                        description={'State is the index of "Item Group Set" of LR(1) and this is analysis table.'}
+                        handleContinue={this.handleContinueAnalysis.bind(this)}
+                    ></TableResult>
+                </>:null}
+                {this.state.process >= 5? <>
+                    <Split x={450} y={-30}></Split>
+                    <GrammarTree
+                        grammarTreeData = {complier.gA.getGrammarTreeData}
+                    ></GrammarTree>
+                </>:null}
             </div>
         )
     }
@@ -166,8 +230,8 @@ ExtDefList -> ExtDef ExtDefList | @
 ExtDef -> VarSpecifier <ID> ; | FunSpecifier FunDec Block
 VarSpecifier -> int
 FunSpecifier -> void | int 
-FunDec -> <ID> CreateFunTable_m ( VarList )
-CreateFunTable_m -> @
+FunDec -> <ID> FunTableM ( VarList )
+FunTableM -> @
 VarList -> ParamDec , VarList | ParamDec | @
 ParamDec -> VarSpecifier <ID>
 Block -> { DefList StmtList }
@@ -185,11 +249,11 @@ CallFunCheck -> @
 Args -> Exp , Args | Exp | @
 ReturnStmt -> return Exp | return
 Relop -> > | < | >= | <= | == | !=
-IfStmt -> if IfStmt_m1 ( Exp ) IfStmt_m2 Block IfNext
-IfStmt_m1 -> @
-IfStmt_m2 -> @
-IfNext -> @ | IfStmt_next else Block
-IfStmt_next -> @
-WhileStmt -> while WhileStmt_m1 ( Exp ) WhileStmt_m2 Block
-WhileStmt_m1 -> @
-WhileStmt_m2 -> @`;
+IfStmt -> if IfM1 ( Exp ) IfM2 Block IfNext
+IfM1 -> @
+IfM2 -> @
+IfNext -> @ | IfNext else Block
+IfNext -> @
+WhileStmt -> while WhileM1 ( Exp ) WhileM2 Block
+WhileM1 -> @
+WhileM2 -> @`;

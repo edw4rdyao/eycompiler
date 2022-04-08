@@ -48,31 +48,38 @@ class Grammar {
         for (let i = 0; i < allProductions.length; i++) {
             // clear the blank in begin and end
             let tmpPro = allProductions[i].trim();
+            if(tmpPro === '') continue;
             let twoPart = tmpPro.split('->');
-            if (twoPart.length != 2) {
-                throw 'Grammar format error!';
+            if (twoPart.length !== 2) {
+                throw {
+                    code: 200,
+                    msg: 'Grammar format error! Please referance the format beside.'
+                }
             }
             let productionLeft = twoPart[0].trim();
             let productionRight = twoPart[1].trim();
 
             // split production right by '|'
             productionRight = productionRight.split('|');
-            if (productionRight.length === 0) {
-                throw 'Grammar format error!';
+            if ((productionRight.length === 1 && productionRight[0] === '') || productionRight.length === 0) {
+                throw {
+                    code: 200,
+                    msg: 'Grammar format error! Please referance the format beside.'
+                }
             }
 
             // get index of left symbol
             let tmpProductionLeft = -1;
-            if (productionLeft != '@Declear') {
+            if (productionLeft !== '@Declear') {
                 tmpProductionLeft = this.getSymbolIndex(productionLeft);
-                if (tmpProductionLeft == -1) {
+                if (tmpProductionLeft === -1) {
                     this.symbols.push(new GrammarSymbol('nonTerminal', productionLeft));
                     tmpProductionLeft = this.symbols.length - 1;
                     this.nonTerminal.push(tmpProductionLeft);
                 }
             }
 
-            if (tmpProductionLeft != -1) {
+            if (tmpProductionLeft !== -1) {
                 // for every production on right
                 for (let i = 0; i < productionRight.length; i++) {
                     let tmpProductionRight = [];
@@ -117,16 +124,13 @@ class Grammar {
             for (let i = 0; i < this.nonTerminal.length; i++) {
                 let nt = this.nonTerminal[i], ntfs = this.symbols[nt].firstSet;
                 for (let j = 0; j < this.productions.length; j++) {
-                    if (i == 1 && j == 1) {
-                        var a = 0;
-                    }
                     let p = this.productions[j];
-                    if (p.leftSymbol != nt) {
+                    if (p.leftSymbol !== nt) {
                         continue;
                     }
                     p = this.productions[j].rightSymbol;
                     // the right is start by terminal or empty
-                    if (this.terminal.indexOf(p[0]) != -1 || this.symbols[p[0]].type === 'empty') {
+                    if (this.terminal.indexOf(p[0]) !== -1 || this.symbols[p[0]].type === 'empty') {
                         // insert the symbol into firstset, and update flag
                         if (!ntfs.has(p[0])) {
                             ntfs.add(p[0]);
@@ -139,7 +143,7 @@ class Grammar {
                     for (let k = 0; k < p.length; k++) {
                         let pk = p[k], pkfs = this.symbols[p[k]].firstSet;
                         // meet terminal
-                        if (this.terminal.indexOf(pk) != -1) {
+                        if (this.terminal.indexOf(pk) !== -1) {
                             // merge the firstset
                             f = this.mergeFirstSet(ntfs, pkfs) || f;
                             be = false;
@@ -173,7 +177,7 @@ class Grammar {
     }
     firstSetOfString(str) {
         var sfs = new Set();
-        if (str.length == 0) return sfs;
+        if (str.length === 0) return sfs;
         var be = true;
 
         // for every symbol
@@ -207,7 +211,7 @@ class Grammar {
         let s = des.size;
         let srcarr = Array.from(src);
         for (let i = 0; i < srcarr.length; i++) {
-            if (this.symbols[srcarr[i]].type != 'empty') {
+            if (this.symbols[srcarr[i]].type !== 'empty') {
                 des.add(srcarr[i]);
             }
         }
@@ -263,8 +267,8 @@ export default class GrammarAnalysis extends Grammar {
 
         // genarate item set group
         this.genItemSetGroup();
+        // genarate item set group
         this.genParsingTable();
-        this.analysisGrammarSemantic();
     }
 
     itemEqual(ita, itb){
@@ -312,7 +316,7 @@ export default class GrammarAnalysis extends Grammar {
                 let toid = itsg.findIndex((v)=>{
                     return this.itemSetEqual(v, toits);
                 });
-                if(toid != -1){
+                if(toid !== -1){
                     // record goto info
                     this.gotoInfo.set(i.toString() + ',' + j.toString(), toid);
                 }
@@ -350,7 +354,7 @@ export default class GrammarAnalysis extends Grammar {
             // find the production begin by ns
             for(let j = 0; j < this.productions.length; j ++){
                 let pj = this.productions[j];
-                if(pj.leftSymbol != ns){
+                if(pj.leftSymbol !== ns){
                     continue;
                 }
                 // push to its
@@ -387,7 +391,7 @@ export default class GrammarAnalysis extends Grammar {
             if(iti.dotPosition >= iti.rightSymbol.length){
                 continue;
             }
-            if(iti.rightSymbol[iti.dotPosition] != s){
+            if(iti.rightSymbol[iti.dotPosition] !== s){
                 continue;
             }
             itsb.push(new ItemLR1(iti.leftSymbol,iti.rightSymbol, iti.proIndex, iti.dotPosition + 1, iti.lookHead));
@@ -423,7 +427,7 @@ export default class GrammarAnalysis extends Grammar {
                     let nts = itj.rightSymbol[itj.dotPosition];
                     // find in goto info
                     let gt = this.gotoInfo.get(i.toString() + ',' + nts.toString());
-                    if(gt != undefined){
+                    if(gt !== undefined){
                         // add to goto table
                         if(this.symbols[nts].type === 'nonTerminal'){
                             this.gotoTable.set(i.toString() + ',' + nts.toString(),{
@@ -449,7 +453,7 @@ export default class GrammarAnalysis extends Grammar {
             this.terminal.forEach((v)=>{
                 let gt = this.actionTable.get(i.toString() + ',' + v.toString());
                 let lb = '';
-                if(gt != undefined){
+                if(gt !== undefined){
                     if(gt.act === 'Accept'){
                         lb = 'acc';
                     }
@@ -476,7 +480,7 @@ export default class GrammarAnalysis extends Grammar {
                 }
                 let gt = this.gotoTable.get(i.toString() + ',' + ntj.toString());
                 let lb = '';
-                if(gt != undefined){
+                if(gt !== undefined){
                     lb = gt.v.toString();
                 }
                 else{
@@ -506,13 +510,19 @@ export default class GrammarAnalysis extends Grammar {
             var tokenpi = this.tokenStream[i];
             var cti = this.getSymbolIndex(tokenpi.token);
             if(cti === -1){
-                throw `Grammar Error: Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col})`;
+                throw {
+                    code: 300,
+                    msg: `Grammar Error: Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col})`
+                }
             }
             // find next action info in action table
             var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
             // parse the action
-            if(next == undefined){
-                throw `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`;
+            if(next === undefined){
+                throw {
+                    code: 301,
+                    msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
+                }
             }
             if(next.act === 'Shift'){
                 sys.push(cti);
@@ -537,8 +547,11 @@ export default class GrammarAnalysis extends Grammar {
                 }
                 // search the goto table
                 next = this.gotoTable.get(sts[sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
-                if(next == undefined){
-                    throw `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`;
+                if(next === undefined){
+                    throw {
+                        code: 301,
+                        msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
+                    }
                 }
                 // push in
                 sys.push(pro.leftSymbol);

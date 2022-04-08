@@ -16,7 +16,7 @@ export default class InputBox extends Component {
 		})
 	}
 
-	handleFiileChange(e) {
+	handleFileChange(e) {
 		var r = new FileReader();
 		var f = e.target;
 		if (f.files.length === 0) {
@@ -53,12 +53,10 @@ export default class InputBox extends Component {
 					<button className="s-button s-blue s-fr" disabled={this.state.submitUnable}
 						onClick={()=>{
 							this.props.handleSubmit(this.state.submitValue);
-						}}>{
-							this.props.type === 'code' ? 'Submit' : 'Analysis'
-						}
+						}}>Submit
 					</button>
 					<button className="s-button s-fr">
-						<input type="file" className="s-upload" onChange={this.handleFiileChange.bind(this)} />Upload
+						<input type="file" className="s-upload" onChange={this.handleFileChange.bind(this)} />Upload
 					</button>
 					<div className="s-description">
 						{this.props.type === 'code' ? 'Type or upload. Please input c-like file.' :
