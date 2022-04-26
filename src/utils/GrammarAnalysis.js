@@ -1,3 +1,5 @@
+import SymanticAnalysis from './SymanticAnalysis.js'
+
 /**
  * @class: GrammarSymbol
  * @description: the symbols in the grammar

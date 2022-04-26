@@ -2,7 +2,7 @@
  * @class: SemanticSymbol
  * @description: the symbol in analysis symbol table
  */
- class SemanticSymbol {
+class SemanticSymbol {
     constructor() {
 
     }
@@ -33,7 +33,7 @@ class SemanticSymbolTable {
  * @class: SymanticAnalysis
  * @description: the symantic analysis while grammar analysis.
  */
-class SymanticAnalysis {
+export default class SymanticAnalysis {
     constructor() {
 
     }
