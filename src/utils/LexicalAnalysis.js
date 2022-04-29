@@ -6,10 +6,7 @@ class Token {
     constructor(token, value, row, col) {
         this.token = token;     // the type of token
         this.value = value;     // the value of token 
-        this.position = {       // position of the token
-            row: row,
-            col: col
-        }
+        this.position = {row: row, col: col} // position of the token
     }
 }
 

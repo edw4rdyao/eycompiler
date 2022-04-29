@@ -4,7 +4,7 @@ import SymanticAnalysis from './SymanticAnalysis.js'
  * @class: GrammarSymbol
  * @description: the symbols in the grammar
  */
- class GrammarSymbol {
+class GrammarSymbol {
     constructor(type, token) {
         this.type = type;
         this.firstSet = new Set();
@@ -50,7 +50,7 @@ class Grammar {
         for (let i = 0; i < allProductions.length; i++) {
             // clear the blank in begin and end
             let tmpPro = allProductions[i].trim();
-            if(tmpPro === '') continue;
+            if (tmpPro === '') continue;
             let twoPart = tmpPro.split('->');
             if (twoPart.length !== 2) {
                 throw {
@@ -87,9 +87,9 @@ class Grammar {
                     let tmpProductionRight = [];
                     // split the every symbol in the right production
                     let everyRightSymbols = productionRight[i].trim().split(/ +/);
-                    everyRightSymbols.forEach((v)=>{
+                    everyRightSymbols.forEach((v) => {
                         let curRightSymbol = this.getSymbolIndex(v);
-                        if(curRightSymbol === -1){
+                        if (curRightSymbol === -1) {
                             // add to symbols
                             this.symbols.push(new GrammarSymbol('nonTerminal', v.trim()));
                             this.nonTerminal.push(this.symbols.length - 1);
@@ -107,7 +107,7 @@ class Grammar {
             }
             else {
                 // push the all terminal
-                productionRight.forEach((v)=>{
+                productionRight.forEach((v) => {
                     this.symbols.push(new GrammarSymbol('terminal', v.trim()));
                     this.terminal.push(this.symbols.length - 1);
                 })
@@ -116,7 +116,7 @@ class Grammar {
     }
     getFirstSet() {
         // for terminal
-        this.terminal.forEach((v)=>{
+        this.terminal.forEach((v) => {
             this.symbols[v].firstSet.add(v);
         })
         // for non terminal
@@ -273,20 +273,20 @@ export default class GrammarAnalysis extends Grammar {
         this.genParsingTable();
     }
 
-    itemEqual(ita, itb){
-        return ita.leftSymbol === itb.leftSymbol && JSON.stringify(ita.rightSymbol) === JSON.stringify(itb.rightSymbol) && 
+    itemEqual(ita, itb) {
+        return ita.leftSymbol === itb.leftSymbol && JSON.stringify(ita.rightSymbol) === JSON.stringify(itb.rightSymbol) &&
             ita.proIndex === itb.proIndex && ita.dotPosition === itb.dotPosition && ita.lookHead === itb.lookHead;
     }
 
-    itemSetEqual(itsa, itsb){
-        if(itsa.length !== itsb.length){
+    itemSetEqual(itsa, itsb) {
+        if (itsa.length !== itsb.length) {
             return false;
         }
         var cnt = 0;
-        for(let i = 0; i < itsa.length; i ++){
-            for(let j = 0; j < itsb.length; j ++){
-                if(this.itemEqual(itsa[i], itsb[j])){
-                    cnt ++;
+        for (let i = 0; i < itsa.length; i++) {
+            for (let j = 0; j < itsb.length; j++) {
+                if (this.itemEqual(itsa[i], itsb[j])) {
+                    cnt++;
                     break;
                 }
             }
@@ -303,26 +303,26 @@ export default class GrammarAnalysis extends Grammar {
         itsg.push(this.getClosure(its));
 
         // for every itemset in itemset group
-        for(let i = 0; i < itsg.length; i ++){
+        for (let i = 0; i < itsg.length; i++) {
             // for every symbol
-            for(let j = 0; j < this.symbols.length; j ++){
+            for (let j = 0; j < this.symbols.length; j++) {
                 // termial or nonTerminal
-                if(this.symbols[j].type !== 'terminal' && this.symbols[j].type !== 'nonTerminal'){
+                if (this.symbols[j].type !== 'terminal' && this.symbols[j].type !== 'nonTerminal') {
                     continue;
                 }
                 let toits = this.getGotoIts(itsg[i], j);
-                if(toits.length === 0){
+                if (toits.length === 0) {
                     continue;
                 }
                 // if already exist
-                let toid = itsg.findIndex((v)=>{
+                let toid = itsg.findIndex((v) => {
                     return this.itemSetEqual(v, toits);
                 });
-                if(toid !== -1){
+                if (toid !== -1) {
                     // record goto info
                     this.gotoInfo.set(i.toString() + ',' + j.toString(), toid);
                 }
-                else{
+                else {
                     // add to itsg and record info
                     this.itemSetGroup.push(toits);
                     this.gotoInfo.set(i.toString() + ',' + j.toString(), this.itemSetGroup.length - 1);
@@ -332,21 +332,21 @@ export default class GrammarAnalysis extends Grammar {
         }
     }
 
-    getClosure(its){
+    getClosure(its) {
         // every item
-        for(let i = 0; i < its.length; i ++){
+        for (let i = 0; i < its.length; i++) {
             let iti = its[i];
             // . in the end
-            if(iti.dotPosition >= iti.rightSymbol.length){
+            if (iti.dotPosition >= iti.rightSymbol.length) {
                 continue;
             }
             // . next symbol
             let ns = iti.rightSymbol[iti.dotPosition];
-            if(this.symbols[ns].type === 'terminal'){
+            if (this.symbols[ns].type === 'terminal') {
                 continue;
             }
-            if(this.symbols[ns].type === 'empty'){
-                iti.dotPosition ++;
+            if (this.symbols[ns].type === 'empty') {
+                iti.dotPosition++;
                 continue;
             }
             // get firstset (A->α.Bβ, a) βa
@@ -354,27 +354,27 @@ export default class GrammarAnalysis extends Grammar {
             betaA.push(iti.lookHead);
             let betaAFs = this.firstSetOfString(betaA);
             // find the production begin by ns
-            for(let j = 0; j < this.productions.length; j ++){
+            for (let j = 0; j < this.productions.length; j++) {
                 let pj = this.productions[j];
-                if(pj.leftSymbol !== ns){
+                if (pj.leftSymbol !== ns) {
                     continue;
                 }
                 // push to its
-                for(let k = 0; k < betaAFs.size; k++){
+                for (let k = 0; k < betaAFs.size; k++) {
                     let fsk = (Array.from(betaAFs))[k];
                     let ittmp = null;
-                    if(this.symbols[pj.rightSymbol[0]].type === 'empty'){
+                    if (this.symbols[pj.rightSymbol[0]].type === 'empty') {
                         ittmp = new ItemLR1(pj.leftSymbol, pj.rightSymbol, j, 1, fsk);
                     }
-                    else{
+                    else {
                         ittmp = new ItemLR1(pj.leftSymbol, pj.rightSymbol, j, 0, fsk);
                     }
                     // to sure there is not yet include this same item
                     let s = 0;
-                    for(s = 0;  s < its.length; s ++){
-                        if(this.itemEqual(ittmp, its[s])) break;
+                    for (s = 0; s < its.length; s++) {
+                        if (this.itemEqual(ittmp, its[s])) break;
                     }
-                    if(s === its.length){
+                    if (s === its.length) {
                         its.push(ittmp);
                     }
                 }
@@ -383,63 +383,63 @@ export default class GrammarAnalysis extends Grammar {
         return its;
     }
 
-    getGotoIts(itsa, s){
+    getGotoIts(itsa, s) {
         let itsb = [];
-        if(this.symbols[s].type !== 'terminal' && this.symbols[s].type !== 'nonTerminal'){
+        if (this.symbols[s].type !== 'terminal' && this.symbols[s].type !== 'nonTerminal') {
             return itsb;
         }
-        for(let i = 0; i < itsa.length; i ++){
+        for (let i = 0; i < itsa.length; i++) {
             let iti = itsa[i];
-            if(iti.dotPosition >= iti.rightSymbol.length){
+            if (iti.dotPosition >= iti.rightSymbol.length) {
                 continue;
             }
-            if(iti.rightSymbol[iti.dotPosition] !== s){
+            if (iti.rightSymbol[iti.dotPosition] !== s) {
                 continue;
             }
-            itsb.push(new ItemLR1(iti.leftSymbol,iti.rightSymbol, iti.proIndex, iti.dotPosition + 1, iti.lookHead));
+            itsb.push(new ItemLR1(iti.leftSymbol, iti.rightSymbol, iti.proIndex, iti.dotPosition + 1, iti.lookHead));
         }
         return this.getClosure(itsb);
     }
 
     genParsingTable() {
         // for every its in itsg, gen goto and action table
-        for(let i = 0; i < this.itemSetGroup.length; i ++){
+        for (let i = 0; i < this.itemSetGroup.length; i++) {
             // for every item
             let itsi = this.itemSetGroup[i];
-            for(let j = 0; j < itsi.length; j ++){
+            for (let j = 0; j < itsi.length; j++) {
                 let itj = itsi[j];
-                if(itj.dotPosition >= itj.rightSymbol.length){
-                    if(this.symbols[itj.leftSymbol].token !== 'S'){
+                if (itj.dotPosition >= itj.rightSymbol.length) {
+                    if (this.symbols[itj.leftSymbol].token !== 'S') {
                         // reduce
-                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(),{
+                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(), {
                             act: 'Reduce',
                             v: itj.proIndex
                         });
                     }
-                    else{
+                    else {
                         // accept
-                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(),{
+                        this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(), {
                             act: 'Accept',
                             v: -1
                         })
                     }
                 }
-                else{
+                else {
                     // next symbol
                     let nts = itj.rightSymbol[itj.dotPosition];
                     // find in goto info
                     let gt = this.gotoInfo.get(i.toString() + ',' + nts.toString());
-                    if(gt !== undefined){
+                    if (gt !== undefined) {
                         // add to goto table
-                        if(this.symbols[nts].type === 'nonTerminal'){
-                            this.gotoTable.set(i.toString() + ',' + nts.toString(),{
+                        if (this.symbols[nts].type === 'nonTerminal') {
+                            this.gotoTable.set(i.toString() + ',' + nts.toString(), {
                                 act: 'Shift',
                                 v: gt
                             })
                         }
                         // add to action table
-                        else if(this.symbols[nts].type === 'terminal'){
-                            this.actionTable.set(i.toString() + ',' + nts.toString(),{
+                        else if (this.symbols[nts].type === 'terminal') {
+                            this.actionTable.set(i.toString() + ',' + nts.toString(), {
                                 act: 'Shift',
                                 v: gt
                             })
@@ -449,24 +449,24 @@ export default class GrammarAnalysis extends Grammar {
             }
         }
         // for every its in itsg, sort for every symbol
-        for(let i = 0; i < this.itemSetGroup.length; i ++){
+        for (let i = 0; i < this.itemSetGroup.length; i++) {
             let tableInfo = [];
             // for every terminal
-            this.terminal.forEach((v)=>{
+            this.terminal.forEach((v) => {
                 let gt = this.actionTable.get(i.toString() + ',' + v.toString());
                 let lb = '';
-                if(gt !== undefined){
-                    if(gt.act === 'Accept'){
+                if (gt !== undefined) {
+                    if (gt.act === 'Accept') {
                         lb = 'acc';
                     }
-                    else if(gt.act === 'Reduce'){
+                    else if (gt.act === 'Reduce') {
                         lb = ('r' + gt.v);
                     }
-                    else if(gt.act === 'Shift'){
+                    else if (gt.act === 'Shift') {
                         lb = ('s' + gt.v);
                     }
                 }
-                else{
+                else {
                     lb = 'err';
                 }
                 tableInfo.push({
@@ -475,17 +475,17 @@ export default class GrammarAnalysis extends Grammar {
                 })
             })
             // for every non terminal
-            for(let j = 0; j < this.nonTerminal.length; j ++){
+            for (let j = 0; j < this.nonTerminal.length; j++) {
                 let ntj = this.nonTerminal[j];
-                if(this.symbols[ntj].token === 'S'){
+                if (this.symbols[ntj].token === 'S') {
                     continue;
                 }
                 let gt = this.gotoTable.get(i.toString() + ',' + ntj.toString());
                 let lb = '';
-                if(gt !== undefined){
+                if (gt !== undefined) {
                     lb = gt.v.toString();
                 }
-                else{
+                else {
                     lb = 'err';
                 }
                 tableInfo.push({
@@ -497,7 +497,7 @@ export default class GrammarAnalysis extends Grammar {
         }
     }
 
-    analysisGrammarSemantic(){
+    analysisGrammarSemantic() {
         // init the user parse infomation
         this.parseInfo.sys.push(this.getSymbolIndex('#'));
         this.parseInfo.sts.push(0);
@@ -506,12 +506,12 @@ export default class GrammarAnalysis extends Grammar {
         var sts = [0];
         var tns = [];
         // for every token
-        for(let i = 0; i < this.tokenStream.length; i ++){
+        for (let i = 0; i < this.tokenStream.length; i++) {
             var cs = sts[sts.length - 1];
             // current token index in sysbolms
             var tokenpi = this.tokenStream[i];
             var cti = this.getSymbolIndex(tokenpi.token);
-            if(cti === -1){
+            if (cti === -1) {
                 throw {
                     code: 300,
                     msg: `Grammar Error: Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col})`
@@ -520,13 +520,13 @@ export default class GrammarAnalysis extends Grammar {
             // find next action info in action table
             var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
             // parse the action
-            if(next === undefined){
+            if (next === undefined) {
                 throw {
                     code: 301,
                     msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
                 }
             }
-            if(next.act === 'Shift'){
+            if (next.act === 'Shift') {
                 sys.push(cti);
                 sts.push(next.v);
                 // push tree node
@@ -535,13 +535,13 @@ export default class GrammarAnalysis extends Grammar {
                 })
                 // todo: semantical analysis
             }
-            else if(next.act === 'Reduce'){
+            else if (next.act === 'Reduce') {
                 var proi = next.v;
                 var pro = this.productions[proi];
                 var tnc = [];
                 // empty need not pop
-                if(this.symbols[pro.rightSymbol[0]].type !== 'empty'){
-                    for(let i = 0; i < pro.rightSymbol.length; i ++){
+                if (this.symbols[pro.rightSymbol[0]].type !== 'empty') {
+                    for (let i = 0; i < pro.rightSymbol.length; i++) {
                         sts.pop();
                         sys.pop();
                         tnc.push(tns.pop());
@@ -549,7 +549,7 @@ export default class GrammarAnalysis extends Grammar {
                 }
                 // search the goto table
                 next = this.gotoTable.get(sts[sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
-                if(next === undefined){
+                if (next === undefined) {
                     throw {
                         code: 301,
                         msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
@@ -562,23 +562,21 @@ export default class GrammarAnalysis extends Grammar {
                 var tn = {
                     name: this.symbols[pro.leftSymbol].token
                 }
-                if(tnc.length !== 0){
+                if (tnc.length !== 0) {
                     tn.children = tnc.reverse();
-                    
                 }
                 tns.push(tn);
-
-                i --;
+                i--;
                 // todo: semantical analysis
             }
-            else if(next.act === 'Accept'){
+            else if (next.act === 'Accept') {
                 this.grammarTree = tns[0];
-                return ;
+                return;
             }
         }
     }
 
-    analysisGrammarSemanticStep(){
+    analysisGrammarSemanticStep() {
         var info = this.parseInfo;
         var cs = info.sts[info.sts.length - 1];
         // current token index in sysbolms
@@ -587,16 +585,16 @@ export default class GrammarAnalysis extends Grammar {
         // find next action info in action table
         var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
         // parse the action
-        if(next.act === 'Shift'){
+        if (next.act === 'Shift') {
             info.sys.push(cti);
             info.sts.push(next.v);
         }
-        else if(next.act === 'Reduce'){
+        else if (next.act === 'Reduce') {
             var proi = next.v;
             var pro = this.productions[proi];
             // empty need not pop
-            if(this.symbols[pro.rightSymbol[0]].type !== 'empty'){
-                for(let i = 0; i < pro.rightSymbol.length; i ++){
+            if (this.symbols[pro.rightSymbol[0]].type !== 'empty') {
+                for (let i = 0; i < pro.rightSymbol.length; i++) {
                     info.sts.pop();
                     info.sys.pop();
                 }
@@ -606,9 +604,9 @@ export default class GrammarAnalysis extends Grammar {
             // push in
             info.sys.push(pro.leftSymbol);
             info.sts.push(next.v);
-            info.pi --;
+            info.pi--;
         }
-        else if(next.act === 'Accept'){
+        else if (next.act === 'Accept') {
             info.po = true;
             return true;
         }
@@ -623,15 +621,15 @@ export default class GrammarAnalysis extends Grammar {
         return this.symbols;
     }
 
-    get getItemSetGroup(){
+    get getItemSetGroup() {
         return this.itemSetGroup;
     }
 
-    get getParserTable(){
+    get getParserTable() {
         return this.parserTable;
     }
 
-    get getGrammarTreeData(){
+    get getGrammarTreeData() {
         return this.grammarTree;
     }
 }

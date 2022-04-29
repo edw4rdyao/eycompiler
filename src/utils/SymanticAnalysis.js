@@ -3,8 +3,12 @@
  * @description: the symbol in analysis symbol table
  */
 class SemanticSymbol {
-    constructor() {
-
+    constructor(token, value, row, col, tableIdx, idx) {
+        this.token = token;
+        this.value = value;
+        this.position = {row: row, col: col};
+        this.tableIdx = tableIdx;
+        this.idx = idx;
     }
 }
 
@@ -13,8 +17,13 @@ class SemanticSymbol {
  * @description: the information of identifier including var function...
  */
 class IdentifierInfo {
-    constructor() {
-
+    constructor(type, typeType, value, fnParamNum, fnEntry, fnIdx) {
+        this.type = type;
+        this.typeType = typeType;
+        this.value = value;
+        this.fnParamNum = fnParamNum;
+        this.fnEntry = fnEntry;
+        this.fnIdx = fnIdx;
     }
 }
 
@@ -24,8 +33,10 @@ class IdentifierInfo {
  *              temptable
  */
 class SemanticSymbolTable {
-    constructor() {
-
+    constructor(type, name) {
+        this.type = type;
+        this.name = name;
+        this.table = [];
     }
 }
 
@@ -35,6 +46,14 @@ class SemanticSymbolTable {
  */
 export default class SymanticAnalysis {
     constructor() {
-
+        this.symbols = []
+        this.tables = []
+        this.domainStack = []
+        this.quaternaries = [];
+        this.nextQ = 1;
+        this.entry = -1;
+        this.tmpCnt = 0;
+        this.backpatchNum = 0;
+        this.backpatchList = [];
     }
 }
