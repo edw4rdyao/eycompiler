@@ -1,6 +1,6 @@
 /**
-* @class: Token
-* @description: the token class
+* @class Token
+* @description the token class
 */
 class Token {
     constructor(token, value, row, col) {
@@ -11,8 +11,8 @@ class Token {
 }
 
 /**
-* @class: LexicalAnalysis
-* @description: do lexical analysis, transform the file to token list
+* @class LexicalAnalysis
+* @description do lexical analysis, transform the file to token list
 */
 export default class LexicalAnalysis {
     constructor(sources) {

@@ -10,8 +10,8 @@ const RegNames = [
 ]
 
 /**
- * @class: AsmGenerator
- * @description: generate asm code from quaternaries
+ * @class AsmGenerator
+ * @description generate asm code from quaternaries
  */
 class AsmGenerator {
   constructor(quaternaries) {

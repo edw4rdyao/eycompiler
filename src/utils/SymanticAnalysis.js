@@ -1,6 +1,6 @@
 /**
- * @class: SemanticSymbol
- * @description: the symbol in analysis symbol table
+ * @class SemanticSymbol
+ * @description the symbol in analysis symbol table
  */
 class SemanticSymbol {
   constructor(token, value, row, col, tableIdx, idx) {
@@ -13,8 +13,8 @@ class SemanticSymbol {
 }
 
 /**
- * @class: Identifier
- * @description: the information of identifier including var function...
+ * @class Identifier
+ * @description the information of identifier including var function...
  */
 class Identifier {
   constructor(type, typeType, value, fnParamNum, fnEntry, fnIdx) {
@@ -28,8 +28,8 @@ class Identifier {
 }
 
 /**
- * @class: SemanticSymbolTable
- * @description: the symbol table including glabal table, fuction table, block table
+ * @class SemanticSymbolTable
+ * @description the symbol table including glabal table, fuction table, block table
  *              temptable
  */
 class SemanticSymbolTable {
@@ -40,6 +40,10 @@ class SemanticSymbolTable {
   }
 }
 
+/**
+ * @class Quaternary
+ * @description the Quaternary object.
+ */
 class Quaternary {
   constructor(index, op, arg1, arg2, res) {
     this.index = index;
@@ -51,8 +55,8 @@ class Quaternary {
 }
 
 /**
- * @class: SymanticAnalysis
- * @description: the symantic analysis while grammar analysis.
+ * @class SymanticAnalysis
+ * @description the symantic analysis while grammar analysis.
  */
 export default class SymanticAnalysis {
   constructor() {
@@ -173,15 +177,110 @@ export default class SymanticAnalysis {
       // add param
       curDomain.table.push(new Identifier('var', type.value, id.value,
         -1, -1, -1));
-      this.tables[0].table.find(s => s.value === curDomain.name).fnParamNum ++;
+      this.tables[0].table.find(s => s.value === curDomain.name).fnParamNum++;
       // add quaternary
-      this.quaternaries.push(new Quaternary(this.nextQ ++, 'param', '-', '-', id.value));
+      this.quaternaries.push(new Quaternary(this.nextQ++, 'param', '-', '-', id.value));
       // update symbols
       for (let i = 0; i < pr.length; i++) {
         this.symbols.pop();
       }
       this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
         id.position.col, this.domainStack.slice(-1)[0], curDomain.table.length - 1));
+    }
+    else if (pl === 'Block') {
+      // update symbols
+      for (let i = 0; i < pr.length; i++) {
+        this.symbols.pop();
+      }
+      this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(),
+        -1, -1, -1, -1));
+    }
+    else if (pl === 'Def') {
+      const id = this.symbols.slice(-2)[0];
+      const type = this.symbols.slice(-3)[0];
+      const curDomain = this.tables[this.domainStack.slice(-1)[0]];
+      // check redefine
+      if (curDomain.table.findIndex(s => s === id.value) !== -1) {
+        throw 'redefine';
+      }
+      curDomain.table.push(new Identifier('var', type.value, id.value,
+        -1, -1, -1));
+      // update symbols
+      for (let i = 0; i < pr.length; i++) {
+        this.symbols.pop();
+      }
+      this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
+        id.position.col, this.domainStack.slice(-1)[0], curDomain.table.length - 1))
+    }
+    else if (pl === 'AssignStmt') {
+      const id = this.symbols.slice(-3)[0];
+      const exp = this.symbols.slice(-1)[0];
+      // check define, by above domains
+      let idDomain = -1;
+      let idIndex = -1;
+      for (let i = this.domainStack.length - 1; i >= 0; i--) {
+        idIndex = this.tables[this.domainStack[i]].table.findIndex(s => s.value === id.value);
+        if (idIndex !== -1) {
+          idDomain = this.domainStack[i];
+          break;
+        }
+      }
+      if (idDomain === -1) {
+        throw 'not define';
+      }
+      // add quaternary
+      this.quaternaries.push(new Quaternary(this.nextQ++, '=', exp.value,
+        '-', id.value));
+      // update symbols
+      for (let i = 0; i < pr.length; i++) {
+        this.symbols.pop();
+      }
+      this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
+        id.position.col, idDomain, idIndex));
+    }
+    else if (pl === 'Exp') {
+      // relation?
+      if (pr.length === 3) {
+        const expLeft = this.symbols.slice(-3)[0];
+        const op = this.symbols.slice(-2)[0];
+        const expRight = this.symbols.slice(-1)[0];
+        const nextQSave = this.nextQ;
+        // add quaternary
+        this.quaternaries.push(new Quaternary())
+        const tmp = `T${(this.tmpCnt++).toString()}`;
+        this.quaternaries.push(new Quaternary(this.nextQ++, 'j' + op.value, expLeft.value,
+          expRight.value, (nextQSave + 3).toString()));
+        this.quaternaries.push(new Quaternary(this.nextQ++, '=', '0', '-', tmp));
+        this.quaternaries.push(new Quaternary(this.nextQ++, 'j', '-', '-', (nextQSave + 4).toString()));
+        this.quaternaries.push(new Quaternary(this.nextQ++, '=', '1', '-', tmp));
+        // update symbols
+        for (let i = 0; i < pr.length; i++) {
+          this.symbols.pop();
+        }
+        this.symbols.push(new SemanticSymbol(pl, tmp, -1, -1, -1, -1));
+      } else {
+        const exp = this.symbols.slice(-1)[0];
+        // update symbols
+        for (let i = 0; i < pr.length; i++) {
+          this.symbols.pop();
+        }
+        this.symbols.push(new SemanticSymbol(pl, exp.value, exp.position.row,
+          exp.position.col, exp.tableIdx, exp.idx));
+      }
+    }
+    else if (pl == 'AddSubExp') {
+      // addsubexp <= item
+      if (pl.length === 1) {
+        const exp = this.symbols.slice(-1)[0];
+        // update symbols
+        for (let i = 0; i < pr.length; i++) {
+          this.symbols.pop();
+        }
+        this.symbols.push(new SemanticSymbol(pl, exp.value, exp.position.row,
+          exp.position.col, exp.tableIdx, exp.idx));
+      }else{
+
+      }
     }
   }
 }

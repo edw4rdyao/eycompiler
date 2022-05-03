@@ -1,8 +1,8 @@
 import SymanticAnalysis from './SymanticAnalysis.js'
 
 /**
- * @class: GrammarSymbol
- * @description: the symbols in the grammar
+ * @class GrammarSymbol
+ * @description the symbols in the grammar
  */
 class GrammarSymbol {
     constructor(type, token) {
@@ -14,8 +14,8 @@ class GrammarSymbol {
 }
 
 /**
- * @class: GrammarProduction
- * @description: the production in grammar e.g. A->BS
+ * @class GrammarProduction
+ * @description the production in grammar e.g. A->BS
  */
 class GrammarProduction {
     constructor(leftSymbol, rightSymbol) {
@@ -25,8 +25,8 @@ class GrammarProduction {
 }
 
 /**
- * @class: Grammar
- * @description: the grammar of the sources
+ * @class Grammar
+ * @description the grammar of the sources
  */
 class Grammar {
     constructor(grammarSource) {
@@ -223,8 +223,8 @@ class Grammar {
 }
 
 /**
- * @class: LR(1) Item
- * @description: the item in LR(1) method A -> B.S
+ * @class LR(1) Item
+ * @description the item in LR(1) method A -> B.S
  */
 class ItemLR1 {
     constructor(leftSymbol, rightSymbol, proIndex, dotPosition, lookHead) {
@@ -237,8 +237,8 @@ class ItemLR1 {
 }
 
 /**
- * @class: GrammarAnalysis
- * @description: the pocess of grammar analysis, using input produce
+ * @class GrammarAnalysis
+ * @description the pocess of grammar analysis, using input produce
  */
 export default class GrammarAnalysis extends Grammar {
     constructor(grammarSource, tokenStream) {
