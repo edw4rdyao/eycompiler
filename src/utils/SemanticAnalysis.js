@@ -450,7 +450,7 @@ export default class SemanticAnalysis {
       this.quaternaries.push(new Quaternary(this.nextQ++, 'j=', exp.value, '0', ''));
       this.backpatchList.push(this.quaternaries.length - 1);
       // ture export, to be backpatch
-      this.quaternaries.push(new Quaternary(this.nextQ++, 'j=', '-', '-', ''));
+      this.quaternaries.push(new Quaternary(this.nextQ++, 'j', '-', '-', ''));
       this.backpatchList.push(this.quaternaries.length - 1);
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(), -1, -1, -1, -1));
     }

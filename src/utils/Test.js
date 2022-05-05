@@ -1,12 +1,12 @@
 import LexicalAnalysis from "./LexicalAnalysis";
 import GrammarAnalysis from "./GrammarAnalysis";
-
+import AsmGenerator from "./AsmGenerator"
 const defaultSourceCode = `int program(int a,int b, int c)
 {
 	int i;
 	int j;
 	i=0;
-	if(a>(b+b))
+	if(a>(b+c))
 	{
 		j=a+(b*c+1);
 	}
@@ -85,5 +85,13 @@ export const Test = ()=>{
   const ga = new GrammarAnalysis(defaultGrammarRules, la.getTokenStream);
   ga.analysisGrammarSemantic();
   console.log(ga.semanticAnalysis.getQuaternaries);
+	const ag = new AsmGenerator(ga.semanticAnalysis.getQuaternaries);
+	ag.generate()
+	console.log(ag.getAsm);
+	var s = '';
+	for(let a of ag.getAsm){
+		s += `${a}\n`;
+	}
+	console.log(s);
 };
 
