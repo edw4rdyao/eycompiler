@@ -5,9 +5,11 @@ import Split from './components/Split'
 import TableResult from './components/TableResult'
 import GrammarTree from './components/GrammarTree'
 import Alert from './components/Alert'
+import DisplayBox from './components/DisplayBox'
 
 import LexicalAnalysis from './utils/LexicalAnalysis'
 import GrammarAnalysis from './utils/GrammarAnalysis'
+import AsmGenerator from './utils/AsmGenerator'
 
 var complier = {
   lA: null,
@@ -118,6 +120,10 @@ export default class Complier extends Component {
     }
   }
 
+  handleGenerateAsm(){
+    
+  }
+
   render() {
     return (
       <div className="s-main">
@@ -172,7 +178,16 @@ export default class Complier extends Component {
           <Split x={450} y={-30}></Split>
           <GrammarTree
             grammarTreeData={complier.gA.getGrammarTreeData}
+            handleContinue={()=>{
+              this.setProcess(6);
+            }}
           ></GrammarTree>
+        </> : null}
+        {this.state.process >= 6 ? <>
+          <Split x={200} y={-30}></Split>
+          <DisplayBox
+            
+          ></DisplayBox>
         </> : null}
       </div>
     )

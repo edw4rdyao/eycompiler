@@ -309,7 +309,7 @@ export default class AsmGenerator {
       }
       // grab a register
       if (!reg) {
-        const regGrab = this.getLruReg(regExpIdx);
+        const regGrab = this.lruReg(regExpIdx);
         const varGrab = this.regVar[regGrab];
         // local var
         if (this.localOffset[varGrab]) {
@@ -341,7 +341,7 @@ export default class AsmGenerator {
     this.regInfo[reg].free = 0;
     return reg;
   }
-  getLruReg(regExpIdx) {
+  lruReg(regExpIdx) {
     let reg = -1, maxFree = -1;
     for (let i = 8; i <= 15; i++) {
       if (this.regInfo[i].free > maxFree && (regExpIdx === -1 || regExpIdx !== i)) {

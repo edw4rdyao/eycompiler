@@ -13,8 +13,7 @@ export default class GrammarTree extends Component {
 				></Tree>
 				<div className="s5-tooltips" id='tooltips'></div>
 				<div>
-					<button className="s-button s-blue s-fr" id="s2-continue">Continue</button>
-					<button className="s-button s-fr">Download</button>
+					<button className="s-button s-blue s-fr" id="s2-continue" onClick={this.props.handleContinue}>Continue</button>
 					<div className="s-description">Displayed by <a href="https://d3js.org.cn/">D3.js</a>. Zoomable and
 						collapsible.</div>
 				</div>

@@ -5,10 +5,10 @@ import { Test } from './utils/Test';
 
 const root = createRoot(document.getElementById("root"));
 
-Test();
+// Test();
 
 root.render(
   <React.StrictMode>
-    {/* <App /> */}
+    <App />
   </React.StrictMode>
 );
