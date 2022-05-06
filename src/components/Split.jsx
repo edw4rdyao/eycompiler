@@ -1,13 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class Split extends Component {
-    render() {
-        var splitStyle = {
-            backgroundPositionX: this.props.x,
-            backgroundPositionY: this.props.y
-        }
-        return (
-            <div className="s-split" style={splitStyle}></div>
-        )
-    }
+export default function Split(props) {
+  const splitStyle = {
+    backgroundPositionX: props.x,
+    backgroundPositionY: props.y
+  }
+  return (
+    <div className="s-split" style={splitStyle}></div>
+  )
 }

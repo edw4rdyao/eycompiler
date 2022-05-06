@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 
 import InputBox from './components/InputBox'
 import Split from './components/Split'
@@ -11,190 +11,7 @@ import LexicalAnalysis from './utils/LexicalAnalysis'
 import GrammarAnalysis from './utils/GrammarAnalysis'
 import AsmGenerator from './utils/AsmGenerator'
 
-var complier = {
-  lA: null,
-  gA: null
-}
-
-export default class Complier extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      process: 1,
-      err: {
-        code: -1,
-        msg: ''
-      }
-    }
-  }
-
-  setProcess(process) {
-    this.setState({
-      process: process
-    })
-  }
-
-  getNewProcess(errCode) {
-    if (errCode >= 100 && errCode < 200) {
-      return 1;
-    }
-    else if (errCode >= 200 && errCode < 300) {
-      return 3;
-    }
-    else if (errCode >= 300 && errCode < 400) {
-      return 4;
-    }
-  }
-
-  handleSubmitSource(sources) {
-    complier.lA = new LexicalAnalysis(sources);
-    try {
-      complier.lA.analysisTokenStream();
-      this.setProcess(2);
-    } catch (e) {
-      this.setState({
-        err: {
-          code: e.code,
-          msg: e.msg
-        }
-      })
-      return;
-    }
-  }
-
-  handleSubmitGrammar(grammar) {
-    try {
-      complier.gA = new GrammarAnalysis(grammar, complier.lA.getTokenStream);
-      this.setProcess(4);
-    }
-    catch (e) {
-      this.setState({
-        err: {
-          code: e.code,
-          msg: e.msg
-        }
-      })
-      return;
-    }
-  }
-
-  handleContinueAnalysis() {
-    try {
-      if (complier.gA) {
-        complier.gA.analysisGrammarSemantic();
-        this.setProcess(5);
-      }
-    }
-    catch (e) {
-      this.setState({
-        err: {
-          code: e.code,
-          msg: e.msg
-        }
-      })
-      return;
-    }
-  }
-
-  handleErrClose(newProcess) {
-    this.setState({
-      process: newProcess,
-      err: {
-        code: -1,
-        msg: ''
-      }
-    })
-  }
-
-  handleErrReset() {
-    this.setState({
-      process: 1,
-      err: {
-        code: -1,
-        msg: ''
-      }
-    })
-    complier = {
-      lA: null,
-      gA: null
-    }
-  }
-
-  handleGenerateAsm(){
-    
-  }
-
-  render() {
-    return (
-      <div className="s-main">
-        {(this.state.err.code !== -1) ?
-          <Alert
-            errMsg={this.state.err.msg}
-            newProcess={this.getNewProcess(this.state.err.code)}
-            handleErrClose={this.handleErrClose.bind(this)}
-            handleErrReset={this.handleErrReset.bind(this)}
-          ></Alert> : null}
-        {this.state.process >= 1 ?
-          <InputBox
-            type={'code'}
-            header={'Input the source code'}
-            initValue={defaultSourceCode}
-            handleSubmit={this.handleSubmitSource.bind(this)}
-          ></InputBox> : null}
-        {this.state.process >= 2 ? <>
-          <Split x={300} y={-30}></Split>
-          <TableResult
-            header={'Lexical Analysis Result'}
-            type={'lexicalResult'}
-            tableData={(complier.lA == null) ? [] : complier.lA.getTokenStream}
-            description={'Type is token kind, value is token string.'}
-            handleContinue={() => {
-              this.setState({
-                process: 3
-              })
-            }}
-          ></TableResult>
-        </> : null}
-        {this.state.process >= 3 ? <>
-          <Split x={400} y={-30}></Split>
-          <InputBox
-            type={'grammar'}
-            header={'Input the grammar rules'}
-            initValue={defaultGrammarRules}
-            handleSubmit={this.handleSubmitGrammar.bind(this)}
-          ></InputBox>
-        </> : null}
-        {this.state.process >= 4 ? <>
-          <Split x={250} y={-30}></Split>
-          <TableResult
-            header={'LR(1) Analysis Table'}
-            type={'lr1Table'}
-            tableData={complier.gA ? complier.gA.getParserTable : []}
-            description={'State is the index of "Item Group Set" of LR(1) and this is analysis table.'}
-            handleContinue={this.handleContinueAnalysis.bind(this)}
-          ></TableResult>
-        </> : null}
-        {this.state.process >= 5 ? <>
-          <Split x={450} y={-30}></Split>
-          <GrammarTree
-            grammarTreeData={complier.gA.getGrammarTreeData}
-            handleContinue={()=>{
-              this.setProcess(6);
-            }}
-          ></GrammarTree>
-        </> : null}
-        {this.state.process >= 6 ? <>
-          <Split x={200} y={-30}></Split>
-          <DisplayBox
-            
-          ></DisplayBox>
-        </> : null}
-      </div>
-    )
-  }
-}
-
-var defaultSourceCode = `int program(int a,int b, int c)
+const defaultSourceCode = `int program(int a,int b, int c)
 {
 	int i;
 	int j;
@@ -236,7 +53,7 @@ void main()
   return ;
 }`;
 
-var defaultGrammarRules = `@Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==
+const defaultGrammarRules = `@Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==
 
 S -> Program
 Program -> ExtDefList 
@@ -271,3 +88,143 @@ IfStmtNext -> @
 WhileStmt -> while WhileM1 ( Exp ) WhileM2 Block
 WhileM1 -> @
 WhileM2 -> @`;
+
+var complier = { la: null, ga: null, ag: null }
+
+export default function Complier() {
+  const [process, setProcess] = useState(1);
+  const [err, setErr] = useState({ code: -1, msg: '' });
+  const [lexicalResult, setLexicalResult] = useState();
+  const [grammarResult, setGrammarResult] = useState();
+  const [grammarTreeData, setGrammarTreeData] = useState();
+  const [interCode, setInterCode] = useState();
+  const [objCode, setObjCode] = useState();
+
+  const nextProcess = (errCode) => {
+    if (errCode >= 100 && errCode < 200) {
+      return 1;
+    } else if (errCode >= 200 && errCode < 300) {
+      return 3;
+    } else if (errCode >= 300 && errCode < 400) {
+      return 4;
+    }
+  }
+
+  return (
+    <div className="s-main">
+      {(err.code !== -1) ?
+        <Alert
+          errMsg={err.msg}
+          handleErrClose={() => {
+            setProcess(nextProcess(err.code));
+            setErr({ code: -1, msg: '' })
+          }}
+          handleErrReset={() => {
+            setProcess(1);
+            setErr({ code: -1, msg: '' });
+            complier = { la: null, ga: null, ag: null };
+          }}
+        ></Alert> : null}
+      {process >= 1 ?
+        <InputBox
+          type={'code'}
+          header={'Input the source code(源程序)'}
+          initValue={defaultSourceCode}
+          handleSubmit={(source) => {
+            complier.la = new LexicalAnalysis(source);
+            try {
+              complier.la.analysisTokenStream();
+              setProcess(2);
+              setLexicalResult(complier.la.getTokenStream);
+            } catch (e) {
+              setErr({ code: e.code, msg: e.msg });
+            }
+          }}
+        ></InputBox> : null}
+      {process >= 2 ? <>
+        <Split x={300} y={-30}></Split>
+        <TableResult
+          header={'Lexical Analysis Result(词法分析)'}
+          type={'lexicalResult'}
+          tableData={lexicalResult}
+          description={'Type is token kind, value is token string.'}
+          handleContinue={() => {
+            setProcess(3);
+          }}
+        ></TableResult>
+      </> : null}
+      {process >= 3 ? <>
+        <Split x={400} y={-30}></Split>
+        <InputBox
+          type={'grammar'}
+          header={'Input the grammar rules(语法规则)'}
+          initValue={defaultGrammarRules}
+          handleSubmit={(grammar) => {
+            try {
+              complier.ga = new GrammarAnalysis(grammar, lexicalResult);
+              setProcess(4);
+              setGrammarResult(complier.ga.getParserTable);
+            } catch (e) {
+              console.log(e)
+              setErr({ code: e.code, msg: e.msg });
+            }
+          }}
+        ></InputBox>
+      </> : null}
+      {process >= 4 ? <>
+        <Split x={250} y={-30}></Split>
+        <TableResult
+          header={'LR(1) Analysis Table(分析表)'}
+          type={'lr1Table'}
+          tableData={grammarResult}
+          description={'State is the index of "Item Group Set" of LR(1) and this is analysis table.'}
+          handleContinue={() => {
+            try {
+              complier.ga.analysisGrammarSemantic();
+              setProcess(5);
+              setGrammarTreeData(complier.ga.getGrammarTreeData);
+              setInterCode(complier.ga.getQuaternaries);
+            } catch (e) {
+              console.log(e);
+              setErr({ code: e.code, msg: e.msg });
+            }
+          }}
+        ></TableResult>
+      </> : null}
+      {process === 5 ? <>
+        <Split x={450} y={-30}></Split>
+        <GrammarTree
+          grammarTreeData={grammarTreeData}
+          handleContinue={() => {
+            setProcess(6);
+          }}
+        ></GrammarTree>
+      </> : null}
+      {process >= 6 ? <>
+        <Split x={200} y={-30}></Split>
+        <DisplayBox
+          header={'Intermediate code(中间代码)'}
+          displayData={interCode}
+          handleContinue={() => {
+            complier.ag = new AsmGenerator(interCode);
+            complier.ag.generate();
+            setProcess(7);
+            setObjCode(complier.ag.getAsm);
+          }}
+          type={'interCode'}
+        ></DisplayBox>
+      </> : null}
+      {process >= 7 ? <>
+        <Split x={400} y={-30}></Split>
+        <DisplayBox
+          header={'Object code(目标代码)'}
+          displayData={objCode}
+          handleContinue={() => {
+            setProcess(7);
+          }}
+          type={'objCode'}
+        ></DisplayBox>
+      </> : null}
+    </div>
+  )
+}

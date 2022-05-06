@@ -61,7 +61,7 @@ export default class LexicalAnalysis {
 				}
 				i++;
 				// is keyword
-				if (keyword.indexOf(curString) != -1) {
+				if (keyword.indexOf(curString) !== -1) {
 					let tmpToken = new Token(curString, curString, curRow, curCol - curString.length + 1);
 					this.tokenStream.push(tmpToken);
 				}
@@ -83,14 +83,14 @@ export default class LexicalAnalysis {
 				this.tokenStream.push(tmpToken);
 			}
 			// is separator
-			else if (separator.indexOf(curString) != -1) {
+			else if (separator.indexOf(curString) !== -1) {
 				let tmpToken = new Token(curString, curString, curRow, curCol);
 				this.tokenStream.push(tmpToken);
 				i++;
 			}
 			// is one line comment
 			else if (curString === "/" && this.sources[i + 1] === "/") {
-				while (i + 1 < this.sources.length && this.sources[i + 1] != "\n") {
+				while (i + 1 < this.sources.length && this.sources[i + 1] !== "\n") {
 					i++;
 				}
 				i += 2;
@@ -113,14 +113,14 @@ export default class LexicalAnalysis {
 				i += 2;
 			}
 			// is two operator
-			else if (operatorTwo.indexOf(curString + this.sources[i + 1]) != -1) {
+			else if (operatorTwo.indexOf(curString + this.sources[i + 1]) !== -1) {
 				curString += this.sources[i + 1];
 				i += 2;
 				let tmpToken = new Token(curString, curString, curRow, curCol - 1);
 				this.tokenStream.push(tmpToken);
 			}
 			// is one operator
-			else if (operatorOne.indexOf(curString) != -1) {
+			else if (operatorOne.indexOf(curString) !== -1) {
 				i++;
 				let tmpToken = new Token(curString, curString, curRow, curCol);
 				this.tokenStream.push(tmpToken);

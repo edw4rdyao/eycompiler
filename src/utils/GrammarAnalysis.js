@@ -114,6 +114,13 @@ class Grammar {
         })
       }
     }
+    // no start
+    if(this.startProduction === -1){
+      throw {
+        code: 200,
+        msg: 'No Start production! Please referance the format beside.'
+      }
+    }
   }
   getFirstSet() {
     // for terminal
@@ -502,6 +509,7 @@ export default class GrammarAnalysis extends Grammar {
     // init the user parse infomation
     this.parseInfo.sys.push(this.getSymbolIndex('#'));
     this.parseInfo.sts.push(0);
+    this.semanticAnalysis = new SemanticAnalysis();
     // system parse infomation
     var sys = [this.getSymbolIndex('#')];
     var sts = [0];
@@ -585,42 +593,42 @@ export default class GrammarAnalysis extends Grammar {
     }
   }
 
-  analysisGrammarSemanticStep() {
-    var info = this.parseInfo;
-    var cs = info.sts[info.sts.length - 1];
-    // current token index in sysbolms
-    var tokenpi = this.tokenStream[info.pi];
-    var cti = this.getSymbolIndex(tokenpi.token);
-    // find next action info in action table
-    var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
-    // parse the action
-    if (next.act === 'Shift') {
-      info.sys.push(cti);
-      info.sts.push(next.v);
-    }
-    else if (next.act === 'Reduce') {
-      var proi = next.v;
-      var pro = this.productions[proi];
-      // empty need not pop
-      if (this.symbols[pro.rightSymbol[0]].type !== 'empty') {
-        for (let i = 0; i < pro.rightSymbol.length; i++) {
-          info.sts.pop();
-          info.sys.pop();
-        }
-      }
-      // search the goto table
-      next = this.gotoTable.get(info.sts[info.sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
-      // push in
-      info.sys.push(pro.leftSymbol);
-      info.sts.push(next.v);
-      info.pi--;
-    }
-    else if (next.act === 'Accept') {
-      info.po = true;
-      return true;
-    }
-    return false;
-  }
+  // analysisGrammarSemanticStep() {
+  //   var info = this.parseInfo;
+  //   var cs = info.sts[info.sts.length - 1];
+  //   // current token index in sysbolms
+  //   var tokenpi = this.tokenStream[info.pi];
+  //   var cti = this.getSymbolIndex(tokenpi.token);
+  //   // find next action info in action table
+  //   var next = this.actionTable.get(cs.toString() + ',' + cti.toString());
+  //   // parse the action
+  //   if (next.act === 'Shift') {
+  //     info.sys.push(cti);
+  //     info.sts.push(next.v);
+  //   }
+  //   else if (next.act === 'Reduce') {
+  //     var proi = next.v;
+  //     var pro = this.productions[proi];
+  //     // empty need not pop
+  //     if (this.symbols[pro.rightSymbol[0]].type !== 'empty') {
+  //       for (let i = 0; i < pro.rightSymbol.length; i++) {
+  //         info.sts.pop();
+  //         info.sys.pop();
+  //       }
+  //     }
+  //     // search the goto table
+  //     next = this.gotoTable.get(info.sts[info.sts.length - 1].toString() + ',' + pro.leftSymbol.toString());
+  //     // push in
+  //     info.sys.push(pro.leftSymbol);
+  //     info.sts.push(next.v);
+  //     info.pi--;
+  //   }
+  //   else if (next.act === 'Accept') {
+  //     info.po = true;
+  //     return true;
+  //   }
+  //   return false;
+  // }
 
   get getProduction() {
     return this.productions;
@@ -640,5 +648,9 @@ export default class GrammarAnalysis extends Grammar {
 
   get getGrammarTreeData() {
     return this.grammarTree;
+  }
+
+  get getQuaternaries(){
+    return this.semanticAnalysis.getQuaternaries;
   }
 }
