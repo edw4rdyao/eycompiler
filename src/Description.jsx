@@ -1,6 +1,10 @@
 import React from 'react'
 
 export default function Description() {
+
+  const symbols = ['<id>', '<int>', '+', '-', '*', '/', '=', '==', '>', '<', '>=', '<=',
+    'return', 'while', 'if else', 'int', 'void'];
+
   return (
     <div className="d-main">
       <div className="des d1">
@@ -17,26 +21,11 @@ export default function Description() {
           The file you input should be c-like. And the symbols supported are below:
         </p>
         <p>
-          <span className='d-tag'>{'[ID]'}</span>
-          <span className='d-tag'>{'[INT]'}</span>
-          <span className='d-tag'>{'*'}</span>
-          <span className='d-tag'>{'+'}</span>
-          <span className='d-tag'>{'-'}</span>
-          <span className='d-tag'>{'='}</span>
-          <span className='d-tag'>{'=='}</span>
-          <span className='d-tag'>{'!='}</span>
-          <span className='d-tag'>{'>'}</span>
-          <span className='d-tag'>{'<'}</span>
-          <span className='d-tag'>{'<='}</span>
-          <span className='d-tag'>{'>='}</span>
-          <span className='d-tag'>{'return'}</span>
-          <span className='d-tag'>{'while'}</span>
-          <span className='d-tag'>{'if-else'}</span>
-          <span className='d-tag'>{'void'}</span>
-          <span className='d-tag'>{'int'}</span>
-        </p>
-        <p>
-
+          {symbols.map((t, i) => {
+            return (
+              <span className='d-tag' key={i}>{t}</span>
+            )
+          })}
         </p>
       </div>
       <div className="des d2">

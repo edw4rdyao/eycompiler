@@ -56,7 +56,7 @@ class Grammar {
       if (twoPart.length !== 2) {
         throw {
           code: 200,
-          msg: 'Grammar format error! Please referance the format beside.'
+          msg: '[Grammar Format Error] Please referance the format beside: 语法规则格式错误'
         }
       }
       let productionLeft = twoPart[0].trim();
@@ -67,7 +67,7 @@ class Grammar {
       if ((productionRight.length === 1 && productionRight[0] === '') || productionRight.length === 0) {
         throw {
           code: 200,
-          msg: 'Grammar format error! Please referance the format beside.'
+          msg: '[Grammar Format Error] Please referance the format beside: 语法规则格式错误'
         }
       }
 
@@ -118,7 +118,7 @@ class Grammar {
     if(this.startProduction === -1){
       throw {
         code: 200,
-        msg: 'No Start production! Please referance the format beside.'
+        msg: '[Grammar Format Error] No Start production! Please referance the format beside: 语法规则格式错误'
       }
     }
   }
@@ -523,7 +523,7 @@ export default class GrammarAnalysis extends Grammar {
       if (cti === -1) {
         throw {
           code: 300,
-          msg: `Grammar Error: Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col})`
+          msg: `[Grammar Error] Undefined Words ${tokenpi.token}, in (${tokenpi.position.row},${tokenpi.position.col}): 不支持的符号`
         }
       }
       // find next action info in action table
@@ -532,7 +532,7 @@ export default class GrammarAnalysis extends Grammar {
       if (next === undefined) {
         throw {
           code: 301,
-          msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
+          msg: `[Grammar Error] Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col}): 语法错误`
         }
       }
       if (next.act === 'Shift') {
@@ -563,7 +563,7 @@ export default class GrammarAnalysis extends Grammar {
         if (next === undefined) {
           throw {
             code: 301,
-            msg: `Grammar Error: Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col})`
+            msg: `[Grammar Error] Can't Analysis, in (${tokenpi.position.row},${tokenpi.position.col}): 语法错误`
           }
         }
         // push in

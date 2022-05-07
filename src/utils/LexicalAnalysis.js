@@ -129,7 +129,7 @@ export default class LexicalAnalysis {
 			else {
 				throw {
 					code: 100,
-					msg: `Lexical Error: Undefined Symbol '${curString}', in (${curRow},${curCol})`
+					msg: `[Lexical Error] Undefined Symbol '${curString}', in (${curRow},${curCol}): 非法的符号`
 				}
 			}
 		}

@@ -100,47 +100,43 @@ export default function Complier() {
   const [interCode, setInterCode] = useState();
   const [objCode, setObjCode] = useState();
 
-  const nextProcess = (errCode) => {
-    if (errCode >= 100 && errCode < 200) {
-      return 1;
-    } else if (errCode >= 200 && errCode < 300) {
-      return 3;
-    } else if (errCode >= 300 && errCode < 400) {
-      return 4;
-    }
-  }
-
   return (
     <div className="s-main">
-      {(err.code !== -1) ?
-        <Alert
-          errMsg={err.msg}
-          handleErrClose={() => {
-            setProcess(nextProcess(err.code));
-            setErr({ code: -1, msg: '' })
-          }}
-          handleErrReset={() => {
-            setProcess(1);
-            setErr({ code: -1, msg: '' });
-            complier = { la: null, ga: null, ag: null };
-          }}
-        ></Alert> : null}
-      {process >= 1 ?
-        <InputBox
-          type={'code'}
-          header={'Input the source code(源程序)'}
-          initValue={defaultSourceCode}
-          handleSubmit={(source) => {
-            complier.la = new LexicalAnalysis(source);
-            try {
-              complier.la.analysisTokenStream();
-              setProcess(2);
-              setLexicalResult(complier.la.getTokenStream);
-            } catch (e) {
-              setErr({ code: e.code, msg: e.msg });
-            }
-          }}
-        ></InputBox> : null}
+      {(err.code !== -1) ? <Alert
+        errMsg={err.msg}
+        handleErrClose={() => {
+          let newProcess;
+          if (err.code >= 100 && err.code < 200) {
+            newProcess = 1;
+          } else if (err.code >= 200 && err.code < 300) {
+            newProcess = 3;
+          } else if (err.code >= 300 && err.code < 400) {
+            newProcess = 4;
+          }
+          setProcess(newProcess);
+          setErr({ code: -1, msg: '' })
+        }}
+        handleErrReset={() => {
+          setProcess(1);
+          setErr({ code: -1, msg: '' });
+          complier = { la: null, ga: null, ag: null };
+        }}>
+      </Alert> : null}
+      {process >= 1 ? <InputBox
+        type={'code'}
+        header={'Input the source code(源程序)'}
+        initValue={defaultSourceCode}
+        handleSubmit={(source) => {
+          complier.la = new LexicalAnalysis(source);
+          try {
+            complier.la.analysisTokenStream();
+            setProcess(2);
+            setLexicalResult(complier.la.getTokenStream);
+          } catch (e) {
+            setErr({ code: e.code, msg: e.msg });
+          }
+        }}>
+      </InputBox> : null}
       {process >= 2 ? <>
         <Split x={300} y={-30}></Split>
         <TableResult

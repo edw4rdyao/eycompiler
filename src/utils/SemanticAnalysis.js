@@ -83,7 +83,10 @@ export default class SemanticAnalysis {
     if (pl === 'Program') {
       // no main procedure
       if (this.entry === -1) {
-        throw 'no main procedure'
+        throw {
+          code: 300,
+          msg: '[Semantic Error] No main function: 未定义main函数'
+        }
       }
       for (let i = 0; i < pr.length; i++) {
         this.symbols.pop();
@@ -100,7 +103,10 @@ export default class SemanticAnalysis {
         // redefine check
         const curDomain = this.tables[this.domainStack.slice(-1)[0]];
         if (curDomain.table.findIndex(s => s.value === id.value) !== -1) {
-          throw 'redefine'
+          throw {
+            code: 300,
+            mag: `[Semantic Error] Redefine '${id.value}', in (${id.position.row},${id.position.row}): 变量重定义`
+          }
         }
         // add to cur table
         curDomain.table.push(new Identifier('var', type.value, id.value, -1, -1, -1));
@@ -146,7 +152,10 @@ export default class SemanticAnalysis {
       const returnType = this.symbols.slice(-2)[0];
       // redefine check
       if (this.tables[0].table.findIndex(s => s.value === id.value) !== -1) {
-        throw 'redefine'
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Redefine '${id.value}', in (${id.position.row}, ${id.position.col}): 函数重定义`
+        }
       }
       // create procedure table
       this.tables.push(new SemanticSymbolTable('function table', id.value));
@@ -175,7 +184,10 @@ export default class SemanticAnalysis {
       const curDomain = this.tables[this.domainStack.slice(-1)[0]];
       // check redefine
       if (curDomain.table.findIndex(s => s.value === id.value) !== -1) {
-        throw 'redefine'
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Redefine '${id.value}', in (${id.position.row}, ${id.position.col}): 参数重定义`
+        }
       }
       // add param
       curDomain.table.push(new Identifier('var', type.value, id.value,
@@ -204,7 +216,10 @@ export default class SemanticAnalysis {
       const curDomain = this.tables[this.domainStack.slice(-1)[0]];
       // check redefine
       if (curDomain.table.findIndex(s => s === id.value) !== -1) {
-        throw 'redefine';
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Redefine '${id.value}', in (${id.position.row}, ${id.position.col}): 变量重定义`
+        }
       }
       curDomain.table.push(new Identifier('var', type.value, id.value,
         -1, -1, -1));
@@ -229,7 +244,10 @@ export default class SemanticAnalysis {
         }
       }
       if (idDomain === -1) {
-        throw 'not define';
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Not define '${id.value}', in (${id.position.row}, ${id.position.col}): 变量未定义`
+        }
       }
       // add quaternary
       this.quaternaries.push(new Quaternary(this.nextQ++, '=', exp.value,
@@ -309,7 +327,10 @@ export default class SemanticAnalysis {
             }
           }
           if (idDomain === -1) {
-            throw 'not define';
+            throw {
+              code: 300,
+              msg: `[Semantic Error] Not define '${exp.value}', in (${exp.position.row}, ${exp.position.col}): 变量未定义`
+            }
           }
         }
         // update symbols
@@ -335,7 +356,10 @@ export default class SemanticAnalysis {
       // check param num
       const paramNum = this.tables[fninfo.tableIdx].table[fninfo.idx].fnParamNum;
       if (parseInt(params.value) !== paramNum) {
-        throw 'params not match'
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Params not match '${fnid.value}', in (${fnid.position.row}, ${fnid.position.col}): 参数不匹配`
+        }
       }
       const tmp = `T${this.tmpCnt++}`;
       this.quaternaries.push(new Quaternary(this.nextQ++, 'call', fnid.value, '-', tmp));
@@ -350,7 +374,10 @@ export default class SemanticAnalysis {
       // check define
       const fnIdx = this.tables[0].table.findIndex(s => (s.value === fnid.value && s.type === 'function'));
       if (fnIdx === -1) {
-        throw 'fuction not define'
+        throw {
+          code: 300,
+          msg: `[Semantic Error] Not define '${fnid.value}', in (${fnid.position.row}, ${fnid.position.col}): 函数未定义`
+        }
       }
       this.symbols.push(new SemanticSymbol(pl, fnid.value, fnid.position.row,
         fnid.position.col, 0, fnIdx));
@@ -394,7 +421,10 @@ export default class SemanticAnalysis {
         const curDomain = this.tables[this.domainStack.slice(-1)[0]];
         // check return type
         if (this.tables[0].table.find(s => s.value === curDomain.name).typeType !== 'void') {
-          throw 'return error';
+          throw {
+            code: 300,
+            msg: `[Semantic Error] Return error '${curDomain.name}': 函数返回值错误`
+          }
         }
         this.quaternaries.push(new Quaternary(this.nextQ++, 'return', '-', '-', curDomain.name));
         // update symbols
