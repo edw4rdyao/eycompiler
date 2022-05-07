@@ -43,41 +43,41 @@ void main()
   return ;
 }`;
 
-const defaultGrammarRules = `@Declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==
+const defaultGrammarRules = `@declear -> return | if | else | while | void | int | <ID> | <INT> | ; | , | ( | ) | { | } | + | - | * | / | = | > | < | >= | <= | != | ==
 
-S -> Program
-Program -> ExtDefList 
-ExtDefList -> ExtDef ExtDefList | @
-ExtDef -> VarSpecifier <ID> ; | FunSpecifier FunDec Block
-VarSpecifier -> int
-FunSpecifier -> void | int 
-FunDec -> <ID> FunTableM ( VarList )
-FunTableM -> @
-VarList -> ParamDec , VarList | ParamDec | @
-ParamDec -> VarSpecifier <ID>
-Block -> { DefList StmtList }
-DefList -> Def DefList | @
-Def -> VarSpecifier <ID> ;
-StmtList -> Stmt StmtList | @
-Stmt -> AssignStmt ; | ReturnStmt ; | IfStmt | WhileStmt | CallStmt ;
-AssignStmt -> <ID> = Exp
-Exp -> AddSubExp | Exp Relop AddSubExp
-AddSubExp -> Item | Item + Item | Item - Item
-Item -> Factor | Factor * Factor | Factor / Factor
-Factor -> <INT> | ( Exp ) | <ID> | CallStmt
-CallStmt -> <ID> ( CallFunCheck Args )
-CallFunCheck -> @
-Args -> Exp , Args | Exp | @
-ReturnStmt -> return Exp | return
-Relop -> > | < | >= | <= | == | !=
-IfStmt -> if IfM1 ( Exp ) IfM2 Block IfNext
-IfM1 -> @
-IfM2 -> @
-IfNext -> @ | IfStmtNext else Block
-IfStmtNext -> @
-WhileStmt -> while WhileM1 ( Exp ) WhileM2 Block
-WhileM1 -> @
-WhileM2 -> @`;
+s -> program
+program -> ext_def_list 
+ext_def_list -> ext_def ext_def_list | @
+ext_def -> var_type <ID> ; | fun_type fun_dec block
+var_type -> int
+fun_type -> void | int 
+fun_dec -> <ID> fun_table_m ( var_list )
+fun_table_m -> @
+var_list -> param_dec , var_list | param_dec | @
+param_dec -> var_type <ID>
+block -> { def_list stmt_list }
+def_list -> def def_list | @
+def -> var_type <ID> ;
+stmt_list -> stmt stmt_list | @
+stmt -> assign_stmt ; | return_stmt ; | if_stmt | while_stmt | call_stmt ;
+assign_stmt -> <ID> = exp
+exp -> add_sub_exp | exp relop add_sub_exp
+add_sub_exp -> item | item + item | item - item
+item -> factor | factor * factor | factor / factor
+factor -> <INT> | ( exp ) | <ID> | call_stmt
+call_stmt -> <ID> ( call_fun_check args )
+call_fun_check -> @
+args -> exp , args | exp | @
+return_stmt -> return exp | return
+relop -> > | < | >= | <= | == | !=
+if_stmt -> if if_m1 ( exp ) if_m2 block if_next
+if_m1 -> @
+if_m2 -> @
+if_next -> @ | if_stmt_next else block
+if_stmt_next -> @
+while_stmt -> while while_m1 ( exp ) while_m2 block
+while_m1 -> @
+while_m2 -> @`;
 
 export const Test = ()=>{
   const la = new LexicalAnalysis(defaultSourceCode);

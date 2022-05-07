@@ -73,7 +73,7 @@ class Grammar {
 
       // get index of left symbol
       let tmpProductionLeft = -1;
-      if (productionLeft !== '@Declear') {
+      if (productionLeft !== '@declear') {
         tmpProductionLeft = this.getSymbolIndex(productionLeft);
         if (tmpProductionLeft === -1) {
           this.symbols.push(new GrammarSymbol('nonTerminal', productionLeft));
@@ -101,7 +101,7 @@ class Grammar {
           // add to production in grammar
           this.productions.push(new GrammarProduction(tmpProductionLeft, tmpProductionRight));
           // first production
-          if (this.symbols[tmpProductionLeft].token === 'S') {
+          if (this.symbols[tmpProductionLeft].token === 's') {
             this.startProduction = this.productions.length - 1;
           }
         }
@@ -417,7 +417,7 @@ export default class GrammarAnalysis extends Grammar {
       for (let j = 0; j < itsi.length; j++) {
         let itj = itsi[j];
         if (itj.dotPosition >= itj.rightSymbol.length) {
-          if (this.symbols[itj.leftSymbol].token !== 'S') {
+          if (this.symbols[itj.leftSymbol].token !== 's') {
             // reduce
             this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(), {
               act: 'Reduce',
@@ -485,7 +485,7 @@ export default class GrammarAnalysis extends Grammar {
       // for every non terminal
       for (let j = 0; j < this.nonTerminal.length; j++) {
         let ntj = this.nonTerminal[j];
-        if (this.symbols[ntj].token === 'S') {
+        if (this.symbols[ntj].token === 's') {
           continue;
         }
         let gt = this.gotoTable.get(i.toString() + ',' + ntj.toString());

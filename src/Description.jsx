@@ -31,6 +31,12 @@ export default function Description() {
       <div className="des d2">
         <h2>Grammar</h2>
         <p>
+          The grammar rules are below:
+        </p>
+        <p>
+          <div className='d-tag'>{'@declear: 终结符声明'}</div>
+          <div className='d-tag'>{'A -> B | C: A可推导B或C'}</div>
+          <div className='d-tag'>{'S: 拓展文法非终结符'}</div>
         </p>
       </div>
     </div>

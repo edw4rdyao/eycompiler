@@ -80,7 +80,7 @@ export default class SemanticAnalysis {
     this.symbols.push(new SemanticSymbol(token, value, row, col, -1, -1));
   }
   analysisSemantic(pl, pr) {
-    if (pl === 'Program') {
+    if (pl === 'program') {
       // no main procedure
       if (this.entry === -1) {
         throw {
@@ -94,7 +94,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, '', -1, -1, -1, -1));
       this.quaternaries.unshift(new Quaternary(0, 'j', '-', '-', this.entry.toString()));
     }
-    else if (pl === 'ExtDef') {
+    else if (pl === 'ext_def') {
       // if is var define
       if (pr.length === 3) {
         // get type and id
@@ -130,7 +130,7 @@ export default class SemanticAnalysis {
           id.position.col, id.tableIdx, id.idx));
       }
     }
-    else if (pl === 'VarSpecifier' || pl === 'FunSpecifier') {
+    else if (pl === 'var_type' || pl === 'fun_type') {
       const type = this.symbols.slice(-1)[0];
       for (let i = 0; i < pr.length; i++) {
         this.symbols.pop();
@@ -138,7 +138,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, type.value, type.position.row,
         type.position.col, -1, -1));
     }
-    else if (pl === 'FunDec') {
+    else if (pl === 'fun_dec') {
       const m = this.symbols.slice(-4)[0];
       for (let i = 0; i < pr.length; i++) {
         this.symbols.pop();
@@ -146,7 +146,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, m.value, m.position.row,
         m.position.col, m.tableIdx, m.idx));
     }
-    else if (pl === 'FunTableM') {
+    else if (pl === 'fun_table_m') {
       // create procedure table
       const id = this.symbols.slice(-1)[0];
       const returnType = this.symbols.slice(-2)[0];
@@ -178,7 +178,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
         id.position.col, 0, this.tables[0].table.length - 1));
     }
-    else if (pl === 'ParamDec') {
+    else if (pl === 'param_dec') {
       const id = this.symbols.slice(-1)[0];
       const type = this.symbols.slice(-2)[0];
       const curDomain = this.tables[this.domainStack.slice(-1)[0]];
@@ -202,7 +202,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
         id.position.col, this.domainStack.slice(-1)[0], curDomain.table.length - 1));
     }
-    else if (pl === 'Block') {
+    else if (pl === 'block') {
       // update symbols
       for (let i = 0; i < pr.length; i++) {
         this.symbols.pop();
@@ -210,7 +210,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(),
         -1, -1, -1, -1));
     }
-    else if (pl === 'Def') {
+    else if (pl === 'def') {
       const id = this.symbols.slice(-2)[0];
       const type = this.symbols.slice(-3)[0];
       const curDomain = this.tables[this.domainStack.slice(-1)[0]];
@@ -230,7 +230,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
         id.position.col, this.domainStack.slice(-1)[0], curDomain.table.length - 1))
     }
-    else if (pl === 'AssignStmt') {
+    else if (pl === 'assign_stmt') {
       const id = this.symbols.slice(-3)[0];
       const exp = this.symbols.slice(-1)[0];
       // check define, by above domains
@@ -259,7 +259,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, id.value, id.position.row,
         id.position.col, idDomain, idIndex));
     }
-    else if (pl === 'Exp') {
+    else if (pl === 'exp') {
       // relation?
       if (pr.length === 3) {
         const expLeft = this.symbols.slice(-3)[0];
@@ -288,7 +288,7 @@ export default class SemanticAnalysis {
           exp.position.col, exp.tableIdx, exp.idx));
       }
     }
-    else if (pl === 'AddSubExp' || pl === 'Item') {
+    else if (pl === 'add_sub_exp' || pl === 'item') {
       // addsubexp <= item
       if (pr.length === 1) {
         const exp = this.symbols.slice(-1)[0];
@@ -312,7 +312,7 @@ export default class SemanticAnalysis {
         this.symbols.push(new SemanticSymbol(pl, tmp, -1, -1, -1, -1));
       }
     }
-    else if (pl === 'Factor') {
+    else if (pl === 'factor') {
       if (pr.length === 1) {
         const exp = this.symbols.slice(-1)[0];
         // check define
@@ -349,7 +349,7 @@ export default class SemanticAnalysis {
           exp.position.col, exp.tableIdx, exp.idx));
       }
     }
-    else if (pl === 'CallStmt') {
+    else if (pl === 'call_stmt') {
       const fnid = this.symbols.slice(-5)[0];
       const fninfo = this.symbols.slice(-3)[0];
       const params = this.symbols.slice(-2)[0];
@@ -369,7 +369,7 @@ export default class SemanticAnalysis {
       }
       this.symbols.push(new SemanticSymbol(pl, tmp, -1, -1, -1, -1));
     }
-    else if (pl === 'CallFunCheck') {
+    else if (pl === 'call_fun_check') {
       const fnid = this.symbols.slice(-2)[0];
       // check define
       const fnIdx = this.tables[0].table.findIndex(s => (s.value === fnid.value && s.type === 'function'));
@@ -382,7 +382,7 @@ export default class SemanticAnalysis {
       this.symbols.push(new SemanticSymbol(pl, fnid.value, fnid.position.row,
         fnid.position.col, 0, fnIdx));
     }
-    else if (pl === 'Args') {
+    else if (pl === 'args') {
       if (pr.length === 3) {
         const exp = this.symbols.slice(-3)[0];
         this.quaternaries.push(new Quaternary(this.nextQ++, 'param', exp.value, '-', '-'));
@@ -404,7 +404,7 @@ export default class SemanticAnalysis {
         this.symbols.push(new SemanticSymbol(pl, '1', -1, -1, -1, -1));
       }
     }
-    else if (pl === 'ReturnStmt') {
+    else if (pl === 'return_stmt') {
       if (pr.length === 2) {
         const returnExp = this.symbols.slice(-1)[0];
         const curDomain = this.tables[this.domainStack.slice(-1)[0]];
@@ -434,7 +434,7 @@ export default class SemanticAnalysis {
         this.symbols.push(new SemanticSymbol(pl, '', -1, -1, -1, -1));
       }
     }
-    else if (pl === 'Relop') {
+    else if (pl === 'relop') {
       const op = this.symbols.slice(-1)[0];
       // update symbols
       for (let i = 0; i < pr.length; i++) {
@@ -442,7 +442,7 @@ export default class SemanticAnalysis {
       }
       this.symbols.push(new SemanticSymbol(pl, op.value, -1, -1, -1, -1));
     }
-    else if (pl === 'IfStmt') {
+    else if (pl === 'if_stmt') {
       const m2 = this.symbols.slice(-3)[0];
       const next = this.symbols.slice(-1)[0];
       if (next.value.length === 0) {
@@ -470,11 +470,11 @@ export default class SemanticAnalysis {
       }
       this.symbols.push(new SemanticSymbol(pl, '', -1, -1, -1, -1));
     }
-    else if (pl === 'IfM1') {
+    else if (pl === 'if_m1') {
       this.backpatchNum++;
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(), -1, -1, -1, -1));
     }
-    else if (pl === 'IfM2') {
+    else if (pl === 'if_m2') {
       const exp = this.symbols.slice(-2)[0];
       // false export, to be backpatch
       this.quaternaries.push(new Quaternary(this.nextQ++, 'j=', exp.value, '0', ''));
@@ -484,7 +484,7 @@ export default class SemanticAnalysis {
       this.backpatchList.push(this.quaternaries.length - 1);
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(), -1, -1, -1, -1));
     }
-    else if (pl === 'IfNext') {
+    else if (pl === 'if_next') {
       const next = this.symbols.slice(-3)[0];
       // update symbols
       for (let i = 0; i < pr.length; i++) {
@@ -492,13 +492,13 @@ export default class SemanticAnalysis {
       }
       this.symbols.push(new SemanticSymbol(pl, next.value, -1, -1, -1, -1));
     }
-    else if (pl === 'IfStmtNext') {
+    else if (pl === 'if_stmt_next') {
       // if jump
       this.quaternaries.push(new Quaternary(this.nextQ++, 'j', '-', '-', ''));
       this.backpatchList.push(this.quaternaries.length - 1);
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(), -1, -1, -1, -1));
     }
-    else if (pl === 'WhileStmt') {
+    else if (pl === 'while_stmt') {
       const m1 = this.symbols.slice(-6)[0];
       const m2 = this.symbols.slice(-2)[0];
       // jump to while
@@ -516,11 +516,11 @@ export default class SemanticAnalysis {
       }
       this.symbols.push(new SemanticSymbol(pl, '', -1, -1, -1, -1));
     }
-    else if (pl === 'WhileM1') {
+    else if (pl === 'while_m1') {
       this.backpatchNum++;
       this.symbols.push(new SemanticSymbol(pl, this.nextQ.toString(), -1, -1, -1, -1));
     }
-    else if (pl === 'WhileM2') {
+    else if (pl === 'while_m2') {
       const exp = this.symbols.slice(-2)[0];
       // false export
       this.quaternaries.push(new Quaternary(this.nextQ++, 'j=', exp.value, '0', ''));
