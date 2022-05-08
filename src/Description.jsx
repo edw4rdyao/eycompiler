@@ -5,6 +5,12 @@ export default function Description() {
   const symbols = ['<id>', '<int>', '+', '-', '*', '/', '=', '==', '>', '<', '>=', '<=',
     'return', 'while', 'if else', 'int', 'void'];
 
+  const grammarRules = [
+    '@declear: a|b|c|... 所有的终结符声明',
+    'A->B|C|...: 产生式形式，A可推导B或C或更多',
+    'S: 拓展文法非终结符，文法规则至少应含有该项'
+  ]
+
   return (
     <div className="d-main">
       <div className="des d1">
@@ -34,9 +40,11 @@ export default function Description() {
           The grammar rules are below:
         </p>
         <p>
-          <div className='d-tag'>{'@declear: 终结符声明'}</div>
-          <div className='d-tag'>{'A -> B | C: A可推导B或C'}</div>
-          <div className='d-tag'>{'S: 拓展文法非终结符'}</div>
+          {grammarRules.map(r=>{
+            return (
+              <div className="d-section">{r}</div>
+            )
+          })}
         </p>
       </div>
     </div>

@@ -85,6 +85,7 @@ export const Test = ()=>{
   const ga = new GrammarAnalysis(defaultGrammarRules, la.getTokenStream);
   ga.analysisGrammarSemantic();
   console.log(ga.semanticAnalysis.getQuaternaries);
+	console.log(ga.getGrammarTreeData);
 	const ag = new AsmGenerator(ga.semanticAnalysis.getQuaternaries);
 	ag.generate()
 	console.log(ag.getAsm);

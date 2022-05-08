@@ -207,6 +207,15 @@ textarea:focus {
   border-radius: var(--border-radius-s);
 }
 
+.d-section {
+  font-size: 0.8em;
+  width: 100%;
+  margin: 10px 0px;
+  padding: 5px 10px;
+  background-color: var(--second-bgc);
+  border-radius: var(--border-radius-s);
+}
+
 .s-main {
   width: 75%;
   margin-right: 5%;

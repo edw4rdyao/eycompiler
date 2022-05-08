@@ -201,6 +201,7 @@ export default function Complier() {
         <DisplayBox
           header={'Intermediate code(中间代码)'}
           displayData={interCode}
+          description={'The itermediate code(Quadruples)'}
           handleContinue={() => {
             complier.ag = new AsmGenerator(interCode);
             complier.ag.generate();
@@ -214,6 +215,7 @@ export default function Complier() {
         <Split x={400} y={-30}></Split>
         <DisplayBox
           header={'Object code(目标代码)'}
+          description={'The object code(MIPS assembly)'}
           displayData={objCode}
           handleContinue={() => {
             setProcess(7);

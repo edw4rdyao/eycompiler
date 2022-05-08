@@ -74,7 +74,7 @@ class Grammar {
       // get index of left symbol
       let tmpProductionLeft = -1;
       if (productionLeft !== '@declear') {
-        tmpProductionLeft = this.getSymbolIndex(productionLeft);
+        tmpProductionLeft = this.symbols.findIndex(s => s.token === productionLeft);
         if (tmpProductionLeft === -1) {
           this.symbols.push(new GrammarSymbol('nonTerminal', productionLeft));
           tmpProductionLeft = this.symbols.length - 1;
@@ -89,7 +89,7 @@ class Grammar {
           // split the every symbol in the right production
           let everyRightSymbols = productionRight[i].trim().split(/ +/);
           everyRightSymbols.forEach((v) => {
-            let curRightSymbol = this.getSymbolIndex(v);
+            let curRightSymbol = this.symbols.findIndex(s => s.token === v);
             if (curRightSymbol === -1) {
               // add to symbols
               this.symbols.push(new GrammarSymbol('nonTerminal', v.trim()));
@@ -115,7 +115,7 @@ class Grammar {
       }
     }
     // no start
-    if(this.startProduction === -1){
+    if (this.startProduction === -1) {
       throw {
         code: 200,
         msg: '[Grammar Format Error] No Start production! Please referance the format beside: 语法规则格式错误'
@@ -161,14 +161,14 @@ class Grammar {
             }
 
             f = this.mergeFirstSet(ntfs, pkfs) || f;
-            be = be && pkfs.has(this.getSymbolIndex('@'));
+            be = be && pkfs.has(this.symbols.findIndex(s => s.token === '@'));
 
             if (!be) break;
           }
           // can be empty
           if (be) {
-            if (!ntfs.has(this.getSymbolIndex('@'))) {
-              ntfs.add(this.getSymbolIndex('@'));
+            if (!ntfs.has(this.symbols.findIndex(s => s.token === '@'))) {
+              ntfs.add(this.symbols.findIndex(s => s.token === '@'));
               f = true;
             }
           }
@@ -177,19 +177,10 @@ class Grammar {
       if (!f) break;
     }
   }
-  getSymbolIndex(str) {
-    for (let i = 0; i < this.symbols.length; i++) {
-      if (str === this.symbols[i].token) {
-        return i;
-      }
-    }
-    return -1;
-  }
   firstSetOfString(str) {
     var sfs = new Set();
     if (str.length === 0) return sfs;
     var be = true;
-
     // for every symbol
     for (let i = 0; i < str.length; i++) {
       let sifs = this.symbols[str[i]].firstSet;
@@ -208,12 +199,12 @@ class Grammar {
       // is non terminal
       this.mergeFirstSet(sfs, sifs);
       // if can be empty, then loop
-      be = be && sifs.has(this.getSymbolIndex('@'));
+      be = be && sifs.has(this.symbols.findIndex(s => s.token === '@'));
       if (!be) break;
     }
     // all can be empty
     if (be) {
-      sfs.add(this.getSymbolIndex('@'));
+      sfs.add(this.symbols.findIndex(s => s.token === '@'));
     }
     return sfs;
   }
@@ -274,7 +265,6 @@ export default class GrammarAnalysis extends Grammar {
       po: false
     }
     this.grammarTree = null;
-
     // genarate item set group
     this.genItemSetGroup();
     // genarate item set group
@@ -303,9 +293,9 @@ export default class GrammarAnalysis extends Grammar {
   }
 
   genItemSetGroup() {
-    // init ItemSet({S-> .Program, $}) and push to itsg
+    // init ItemSet({s-> .program, $}) and push to itsg
     var sp = this.productions[this.startProduction];
-    var it = new ItemLR1(sp.leftSymbol, sp.rightSymbol, this.startProduction, 0, this.getSymbolIndex('#'));
+    var it = new ItemLR1(sp.leftSymbol, sp.rightSymbol, this.startProduction, 0, this.symbols.findIndex(s => s.token === '#'));
     var its = [], itsg = this.itemSetGroup;
     its.push(it);
     itsg.push(this.getClosure(its));
@@ -335,7 +325,6 @@ export default class GrammarAnalysis extends Grammar {
           this.itemSetGroup.push(toits);
           this.gotoInfo.set(i.toString() + ',' + j.toString(), this.itemSetGroup.length - 1);
         }
-
       }
     }
   }
@@ -423,16 +412,14 @@ export default class GrammarAnalysis extends Grammar {
               act: 'Reduce',
               v: itj.proIndex
             });
-          }
-          else {
+          } else {
             // accept
             this.actionTable.set(i.toString() + ',' + itj.lookHead.toString(), {
               act: 'Accept',
               v: -1
             })
           }
-        }
-        else {
+        } else {
           // next symbol
           let nts = itj.rightSymbol[itj.dotPosition];
           // find in goto info
@@ -473,8 +460,7 @@ export default class GrammarAnalysis extends Grammar {
           else if (gt.act === 'Shift') {
             lb = ('s' + gt.v);
           }
-        }
-        else {
+        } else {
           lb = 'err';
         }
         tableInfo.push({
@@ -506,20 +492,21 @@ export default class GrammarAnalysis extends Grammar {
   }
 
   analysisGrammarSemantic() {
-    // init the user parse infomation
-    this.parseInfo.sys.push(this.getSymbolIndex('#'));
-    this.parseInfo.sts.push(0);
+    // // init the user parse infomation
+    // this.parseInfo.sys.push(this.getSymbolIndex('#'));
+    // this.parseInfo.sts.push(0);
     this.semanticAnalysis = new SemanticAnalysis();
     // system parse infomation
-    var sys = [this.getSymbolIndex('#')];
-    var sts = [0];
-    var tns = [];
+    let sys = [this.symbols.findIndex(s => s.token === '#')];
+    let sts = [0];
+    let tns = [];
     // for every token
+    let cs, tokenpi, cti;
     for (let i = 0; i < this.tokenStream.length; i++) {
-      var cs = sts[sts.length - 1];
+      cs = sts[sts.length - 1];
       // current token index in sysbolms
-      var tokenpi = this.tokenStream[i];
-      var cti = this.getSymbolIndex(tokenpi.token);
+      tokenpi = this.tokenStream[i];
+      cti = this.symbols.findIndex(s => s.token === tokenpi.token);
       if (cti === -1) {
         throw {
           code: 300,
@@ -540,13 +527,11 @@ export default class GrammarAnalysis extends Grammar {
         sts.push(next.v);
         // push tree node
         tns.push({
-          name: tokenpi.token
+          name: tokenpi.value
         })
         // semantical analysis
         this.semanticAnalysis.addSymbols(tokenpi.token, tokenpi.value, tokenpi.position.row, tokenpi.position.col);
-
-      }
-      else if (next.act === 'Reduce') {
+      } else if (next.act === 'Reduce') {
         var proi = next.v;
         var pro = this.productions[proi];
         var tnc = [];
@@ -650,7 +635,7 @@ export default class GrammarAnalysis extends Grammar {
     return this.grammarTree;
   }
 
-  get getQuaternaries(){
+  get getQuaternaries() {
     return this.semanticAnalysis.getQuaternaries;
   }
 }
