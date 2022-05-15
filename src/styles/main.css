@@ -201,7 +201,7 @@ textarea:focus {
 
 .d-tag {
   display: inline-block;
-  margin: 3px 5px 3px 0px;
+  margin: 0px 5px 3px 0px;
   background-color: var(--second-bgc);
   padding: 0px 8px;
   border-radius: var(--border-radius-s);
@@ -319,8 +319,8 @@ textarea:focus {
   border-radius: var(--border-radius-s);
   overflow: auto;
   max-height: 400px;
-  font-size: 0.9em;
   font-family: 'AzeretMono';
+  font-size: 0.9em;
 }
 
 .input-box {
