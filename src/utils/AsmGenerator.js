@@ -49,7 +49,7 @@ export default class AsmGenerator {
   }
   generate() {
     this.asm.push(`addi $sp, $sp, 0x${StackStartAddr.toString(16)}`);
-    this.asm.push(`addi $sp, $sp, 0x${(StackStartAddr - 4).toString(16)}`);
+    this.asm.push(`addi $fp, $fp, 0x${(StackStartAddr - 4).toString(16)}`);
     for (let q of this.quaternaries) {
       for (let r of this.regInfo) {
         r.free++;
@@ -279,10 +279,6 @@ export default class AsmGenerator {
     }
   }
   assignReg(v, regExpIdx) {
-    if (v === '-') {
-      let a = 0;
-      let b = 0;
-    }
     let reg;
     // assign memory
     if (!this.localOffset[v] && !this.globalAddr[v]) {
