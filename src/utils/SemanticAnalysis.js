@@ -215,7 +215,7 @@ export default class SemanticAnalysis {
       const type = this.symbols.slice(-3)[0];
       const curDomain = this.tables[this.domainStack.slice(-1)[0]];
       // check redefine
-      if (curDomain.table.findIndex(s => s === id.value) !== -1) {
+      if (curDomain.table.findIndex(s => s.value === id.value) !== -1) {
         throw {
           code: 300,
           msg: `[Semantic Error] Redefine '${id.value}', in (${id.position.row}, ${id.position.col}): 变量重定义`
